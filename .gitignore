@@ -18,6 +18,12 @@ desktop.ini
 *.log
 *.tmp
 
+# Build
+dist/
+
+# Локальный конфиг Claude Code (машинно-специфичный)
+.claude/
+
 # секреты и рантайм — НИКОГДА не коммитим
 *secret*
 *token*
