@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+.venv-win/
+
+# Node
+node_modules/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+*.log
+*.tmp
+
+# секреты и рантайм — НИКОГДА не коммитим
+*secret*
+*token*
+*.pem
+*.key
+*.db
+extra_admins.json
