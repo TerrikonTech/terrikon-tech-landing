@@ -4,8 +4,8 @@ import ContactButton from './ContactButton'
 
 const NAV_LINKS = ['About', 'Price', 'Projects', 'Contact']
 
-const PORTRAIT_URL =
-  'https://shrug-person-78902957.figma.site/_components/v2/d24c01ad3a56fc65e942a1f501eb73db42d7cf9a/Rectangle_40443.81459862.png'
+const PORTRAIT_VIDEO_URL =
+  'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260601_110537_3a579fa0-7bbc-4d94-9d25-0e816c7840f5.mp4'
 
 export default function HeroSection() {
   return (
@@ -43,10 +43,14 @@ export default function HeroSection() {
             activeTransition="transform 0.3s ease-out"
             inactiveTransition="transform 0.6s ease-in-out"
           >
-            <img
-              src={PORTRAIT_URL}
-              alt="Jack — 3D creator portrait"
-              className="h-auto w-full"
+            <video
+              src={PORTRAIT_VIDEO_URL}
+              autoPlay
+              loop
+              muted
+              playsInline
+              aria-label="Jack — 3D creator portrait"
+              className="aspect-square w-full rounded-[40px] object-cover object-right-bottom sm:rounded-b-none sm:rounded-t-[50px] md:rounded-t-[60px]"
             />
           </Magnet>
         </FadeIn>
