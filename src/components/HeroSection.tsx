@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import FadeIn from './FadeIn'
 import ContactButton from './ContactButton'
 import ThemeSwitch from './ThemeSwitch'
+import LogoMark from './LogoMark'
 
 const NAV_LINKS = [
   { label: 'О нас', href: '#about' },
@@ -115,6 +116,11 @@ export default function HeroSection({
       <div className="relative z-[5] flex flex-1 flex-col">
         <FadeIn delay={0} y={-20}>
           <nav className="flex items-center justify-between px-6 pt-6 md:px-10 md:pt-8">
+            <a href="#top" aria-label="Наверх">
+              <LogoMark
+                className={`h-6 w-7 transition-opacity duration-200 hover:opacity-70 md:h-8 md:w-9 ${onLightBg ? 'bg-[#BBCCD7] lg:bg-black' : 'bg-[#BBCCD7]'}`}
+              />
+            </a>
             {NAV_LINKS.map((link) => (
               <a
                 key={link.href}
