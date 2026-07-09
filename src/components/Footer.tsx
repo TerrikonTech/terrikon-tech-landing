@@ -15,7 +15,7 @@ const NAV_COLUMNS = [
   {
     title: 'Полезные ссылки',
     links: [
-      { label: 'Услуги и цены', href: '#price' },
+      { label: 'Услуги', href: '#price' },
       { label: 'Наверх', href: '#top' },
     ],
   },

@@ -5,7 +5,6 @@ import ThemeSwitch from './ThemeSwitch'
 
 const NAV_LINKS = [
   { label: 'О нас', href: '#about' },
-  { label: 'Цены', href: '#price' },
   { label: 'Проекты', href: '#projects' },
   { label: 'Контакт', href: '#contact' },
 ]
