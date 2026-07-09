@@ -1,17 +1,20 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import FadeIn from './FadeIn'
 import ContactButton from './ContactButton'
+import ThemeSwitch from './ThemeSwitch'
 
 const NAV_LINKS = ['About', 'Price', 'Projects', 'Contact']
 
-// Локальная перекодировка манекена из mainframe-hero: 1080p, all-intra
-// (каждый кадр ключевой) — сик по любому времени декодирует ровно один кадр
-const PORTRAIT_VIDEO_URL = '/portrait-scrub.mp4'
+// Локальные перекодировки: 1080p, all-intra (каждый кадр ключевой) —
+// сик по любому времени декодирует ровно один кадр.
+// Светлая тема — манекен из mainframe-hero, тёмная — лама из SynapseX.
+const PORTRAIT_VIDEO_LIGHT = '/portrait-scrub.mp4'
+const PORTRAIT_VIDEO_DARK = '/portrait-scrub-dark.mp4'
 
 // Логика из mainframe-hero: видео не проигрывается само — кадр мотается
 // только движением мыши. Автоплей остаётся лишь на тач-устройствах,
 // где скраббинг курсором невозможен.
-function ScrubVideo() {
+function ScrubVideo({ src }: { src: string }) {
   const videoRef = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
@@ -73,7 +76,7 @@ function ScrubVideo() {
         muted
         playsInline
         preload="auto"
-        src={PORTRAIT_VIDEO_URL}
+        src={src}
         aria-label="Jack — 3D creator portrait"
         className="h-full w-full object-cover object-right lg:object-right-bottom"
       />
@@ -82,31 +85,53 @@ function ScrubVideo() {
 }
 
 export default function HeroSection() {
+  const [darkTheme, setDarkTheme] = useState(
+    () => localStorage.getItem('jack-theme') === 'dark',
+  )
+
+  useEffect(() => {
+    localStorage.setItem('jack-theme', darkTheme ? 'dark' : 'light')
+  }, [darkTheme])
+
+  // В светлой теме фон видео на lg светлый — текст hero затемняется;
+  // в тёмной (лама на чёрном) текст остаётся светлым на всех ширинах
+  const onLightBg = !darkTheme
+
   return (
     <section
       className="relative flex h-screen flex-col"
       style={{ overflowX: 'clip' }}
     >
-      <ScrubVideo />
+      <ScrubVideo
+        key={darkTheme ? 'dark' : 'light'}
+        src={darkTheme ? PORTRAIT_VIDEO_DARK : PORTRAIT_VIDEO_LIGHT}
+      />
 
       <div className="relative z-[5] flex flex-1 flex-col">
         <FadeIn delay={0} y={-20}>
-          <nav className="flex justify-between px-6 pt-6 md:px-10 md:pt-8">
+          <nav className="flex items-center justify-between px-6 pt-6 md:px-10 md:pt-8">
             {NAV_LINKS.map((link) => (
               <a
                 key={link}
                 href={`#${link.toLowerCase()}`}
-                className="text-sm font-medium uppercase tracking-wider text-[#D7E2EA] transition-opacity duration-200 hover:opacity-70 md:text-lg lg:text-[1.4rem] lg:text-[#0C0C0C]"
+                className={`text-sm font-medium uppercase tracking-wider text-[#D7E2EA] transition-opacity duration-200 hover:opacity-70 md:text-lg lg:text-[1.4rem] ${onLightBg ? 'lg:text-[#0C0C0C]' : ''}`}
               >
                 {link}
               </a>
             ))}
+            <ThemeSwitch
+              checked={darkTheme}
+              onChange={setDarkTheme}
+              onLightBg={onLightBg}
+            />
           </nav>
         </FadeIn>
 
         <div className="overflow-hidden">
           <FadeIn delay={0.15} y={40}>
-            <h1 className="hero-heading hero-heading-on-video mt-6 w-full whitespace-nowrap text-center text-[14vw] font-black uppercase leading-none tracking-tight sm:mt-4 sm:text-[15vw] md:-mt-5 md:text-[16vw] lg:text-[17.5vw]">
+            <h1
+              className={`hero-heading ${onLightBg ? 'hero-heading-on-video' : ''} mt-6 w-full whitespace-nowrap text-center text-[14vw] font-black uppercase leading-none tracking-tight sm:mt-4 sm:text-[15vw] md:-mt-5 md:text-[16vw] lg:text-[17.5vw]`}
+            >
               Hi, i&apos;m jack
             </h1>
           </FadeIn>
@@ -115,7 +140,7 @@ export default function HeroSection() {
         <div className="mt-auto flex items-end justify-between px-6 pb-7 sm:pb-8 md:px-10 md:pb-10">
           <FadeIn delay={0.35} y={20}>
             <p
-              className="max-w-[160px] font-light uppercase leading-snug tracking-wide text-[#D7E2EA] sm:max-w-[220px] md:max-w-[260px] lg:text-[#0C0C0C]"
+              className={`max-w-[160px] font-light uppercase leading-snug tracking-wide text-[#D7E2EA] sm:max-w-[220px] md:max-w-[260px] ${onLightBg ? 'lg:text-[#0C0C0C]' : ''}`}
               style={{ fontSize: 'clamp(0.75rem, 1.4vw, 1.5rem)' }}
             >
               a 3d creator driven by crafting striking and unforgettable
