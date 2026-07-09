@@ -19,7 +19,7 @@ const PORTRAIT_VIDEO_DARK = '/portrait-scrub-dark.mp4'
 // Логика из mainframe-hero: видео не проигрывается само — кадр мотается
 // только движением мыши. Автоплей остаётся лишь на тач-устройствах,
 // где скраббинг курсором невозможен.
-function ScrubVideo({ src }: { src: string }) {
+function ScrubVideo({ src, blendClass }: { src: string; blendClass: string }) {
   const videoRef = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
@@ -75,7 +75,9 @@ function ScrubVideo({ src }: { src: string }) {
   }, [])
 
   return (
-    <div className="pointer-events-none relative order-last w-full overflow-hidden aspect-square md:aspect-video lg:absolute lg:inset-0 lg:z-0 lg:order-none lg:aspect-auto lg:h-full">
+    <div
+      className={`pointer-events-none relative order-last w-full overflow-hidden aspect-square md:aspect-video lg:absolute lg:inset-0 lg:z-[2] lg:order-none lg:aspect-auto lg:h-full ${blendClass}`}
+    >
       <video
         ref={videoRef}
         muted
@@ -105,16 +107,20 @@ export default function HeroSection({
   return (
     <section
       id="top"
-      className="relative flex h-screen flex-col"
+      className="relative isolate flex h-screen flex-col"
       style={{ overflowX: 'clip' }}
     >
+      {/* На lg видео лежит ПОВЕРХ заголовка (z-2 > z-1) с blend-режимом:
+          darken на светлом фоне / lighten на тёмном — фон видео пропускает
+          текст, а фигура его перекрывает. Вырезать субъекта не нужно. */}
       <ScrubVideo
         key={darkTheme ? 'dark' : 'light'}
         src={darkTheme ? PORTRAIT_VIDEO_DARK : PORTRAIT_VIDEO_LIGHT}
+        blendClass={darkTheme ? 'lg:mix-blend-lighten' : 'lg:mix-blend-darken'}
       />
 
-      <div className="relative z-[5] flex flex-1 flex-col">
-        <FadeIn delay={0} y={-20}>
+      <div className="relative flex flex-1 flex-col">
+        <FadeIn delay={0} y={-20} className="relative z-10">
           <nav className="flex items-center justify-between px-6 pt-6 md:px-10 md:pt-8">
             <a href="#top" aria-label="Наверх">
               <LogoMark
@@ -138,7 +144,7 @@ export default function HeroSection({
           </nav>
         </FadeIn>
 
-        <div className="overflow-hidden">
+        <div className="relative z-[1] overflow-hidden">
           <FadeIn delay={0.15} y={40}>
             <h1
               className={`hero-heading ${onLightBg ? 'hero-heading-on-video' : ''} mt-6 w-full whitespace-nowrap text-center font-display text-[12.5vw] font-black leading-none tracking-tight sm:mt-4 md:-mt-5`}
@@ -148,7 +154,7 @@ export default function HeroSection({
           </FadeIn>
         </div>
 
-        <div className="mt-auto flex items-end justify-between px-6 pb-7 sm:pb-8 md:px-10 md:pb-10">
+        <div className="relative z-10 mt-auto flex items-end justify-between px-6 pb-7 sm:pb-8 md:px-10 md:pb-10">
           <FadeIn delay={0.35} y={20}>
             <p
               className={`max-w-[180px] font-normal leading-snug text-[#D7E2EA] sm:max-w-[240px] md:max-w-[280px] ${onLightBg ? 'lg:text-[#0C0C0C]' : ''}`}
