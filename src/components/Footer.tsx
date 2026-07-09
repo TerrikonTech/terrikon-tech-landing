@@ -1,4 +1,5 @@
-import { Mountain, Send } from 'lucide-react'
+import { Send } from 'lucide-react'
+import LogoMark from './LogoMark'
 
 // Футер в духе Nur/ui: колонки ссылок, разделитель, соцлинк + копирайт
 // и гигантский контурный водяной знак «ТЕРРИКОН», обрезанный снизу
@@ -31,7 +32,7 @@ export default function Footer() {
         {/* Лого + описание */}
         <div>
           <div className="flex items-center gap-2.5">
-            <Mountain className="h-7 w-7 text-[#BBCCD7]" strokeWidth={2.2} />
+            <LogoMark className="h-7 w-8 bg-[#BBCCD7]" />
             <span className="text-2xl font-bold tracking-tight text-white">
               Террикон
             </span>
