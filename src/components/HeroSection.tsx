@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import FadeIn from './FadeIn'
 import ContactButton from './ContactButton'
+import SubjectKeyCanvas from './SubjectKeyCanvas'
 import ThemeSwitch from './ThemeSwitch'
 import LogoMark from './LogoMark'
 
@@ -19,7 +20,7 @@ const PORTRAIT_VIDEO_DARK = '/portrait-scrub-dark.mp4'
 // Логика из mainframe-hero: видео не проигрывается само — кадр мотается
 // только движением мыши. Автоплей остаётся лишь на тач-устройствах,
 // где скраббинг курсором невозможен.
-function ScrubVideo({ src, blendClass }: { src: string; blendClass: string }) {
+function ScrubVideo({ src, dark }: { src: string; dark: boolean }) {
   const videoRef = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
@@ -75,19 +76,20 @@ function ScrubVideo({ src, blendClass }: { src: string; blendClass: string }) {
   }, [])
 
   return (
-    <div
-      className={`pointer-events-none relative order-last w-full overflow-hidden aspect-square md:aspect-video lg:absolute lg:inset-0 lg:z-[2] lg:order-none lg:aspect-auto lg:h-full ${blendClass}`}
-    >
-      <video
-        ref={videoRef}
-        muted
-        playsInline
-        preload="auto"
-        src={src}
-        aria-label="Джек — видео-портрет 3D-художника"
-        className="h-full w-full object-cover object-right lg:object-right-bottom"
-      />
-    </div>
+    <>
+      <div className="pointer-events-none relative order-last w-full overflow-hidden aspect-square md:aspect-video lg:absolute lg:inset-0 lg:z-0 lg:order-none lg:aspect-auto lg:h-full">
+        <video
+          ref={videoRef}
+          muted
+          playsInline
+          preload="auto"
+          src={src}
+          aria-label="Джек — видео-портрет 3D-художника"
+          className="h-full w-full object-cover object-right lg:object-right-bottom"
+        />
+      </div>
+      <SubjectKeyCanvas videoRef={videoRef} dark={dark} />
+    </>
   )
 }
 
@@ -110,13 +112,13 @@ export default function HeroSection({
       className="relative isolate flex h-screen flex-col"
       style={{ overflowX: 'clip' }}
     >
-      {/* На lg видео лежит ПОВЕРХ заголовка (z-2 > z-1) с blend-режимом:
-          darken на светлом фоне / lighten на тёмном — фон видео пропускает
-          текст, а фигура его перекрывает. Вырезать субъекта не нужно. */}
+      {/* На lg заголовок лежит МЕЖДУ видео и канвасом-вырезкой:
+          видео z-0, текст z-1, SubjectKeyCanvas z-2 рисует только фигуру
+          (кеинг по цвету фона) — голова перекрывает буквы. */}
       <ScrubVideo
         key={darkTheme ? 'dark' : 'light'}
         src={darkTheme ? PORTRAIT_VIDEO_DARK : PORTRAIT_VIDEO_LIGHT}
-        blendClass={darkTheme ? 'lg:mix-blend-lighten' : 'lg:mix-blend-darken'}
+        dark={darkTheme}
       />
 
       <div className="relative flex flex-1 flex-col">
