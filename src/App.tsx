@@ -6,6 +6,7 @@ import AboutSection from './components/AboutSection'
 import ServicesSection from './components/ServicesSection'
 import ProjectsSection from './components/ProjectsSection'
 import TeamSection from './components/TeamSection'
+import TerrikonRidge from './components/TerrikonRidge'
 import Footer from './components/Footer'
 
 export default function App() {
@@ -19,7 +20,7 @@ export default function App() {
 
   return (
     <main
-      className="min-h-screen bg-[#0C0C0C] font-display"
+      className="min-h-screen bg-[#0C0C0C] font-sans"
       style={{ overflowX: 'clip' }}
     >
       <Preloader />
@@ -29,6 +30,7 @@ export default function App() {
       <ServicesSection />
       <ProjectsSection />
       <TeamSection />
+      <TerrikonRidge />
       <Footer />
     </main>
   )

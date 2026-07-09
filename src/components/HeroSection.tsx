@@ -141,7 +141,7 @@ export default function HeroSection({
         <div className="overflow-hidden">
           <FadeIn delay={0.15} y={40}>
             <h1
-              className={`hero-heading ${onLightBg ? 'hero-heading-on-video' : ''} mt-6 w-full whitespace-nowrap text-center text-[10.8vw] font-black uppercase leading-none tracking-tight sm:mt-4 sm:text-[11.5vw] md:-mt-5 md:text-[12.3vw] lg:text-[13.4vw]`}
+              className={`hero-heading ${onLightBg ? 'hero-heading-on-video' : ''} mt-6 w-full whitespace-nowrap text-center font-display text-[12.5vw] font-black leading-none tracking-tight sm:mt-4 md:-mt-5`}
             >
               Хай, я Джек
             </h1>
@@ -151,7 +151,7 @@ export default function HeroSection({
         <div className="mt-auto flex items-end justify-between px-6 pb-7 sm:pb-8 md:px-10 md:pb-10">
           <FadeIn delay={0.35} y={20}>
             <p
-              className={`max-w-[160px] font-light uppercase leading-snug tracking-wide text-[#D7E2EA] sm:max-w-[220px] md:max-w-[260px] ${onLightBg ? 'lg:text-[#0C0C0C]' : ''}`}
+              className={`max-w-[180px] font-normal leading-snug text-[#D7E2EA] sm:max-w-[240px] md:max-w-[280px] ${onLightBg ? 'lg:text-[#0C0C0C]' : ''}`}
               style={{ fontSize: 'clamp(0.75rem, 1.4vw, 1.5rem)' }}
             >
               3D-художник, одержимый созданием ярких и незабываемых проектов

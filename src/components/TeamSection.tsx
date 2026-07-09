@@ -58,16 +58,13 @@ export default function TeamSection() {
 
       <div className="relative z-10 mx-auto flex max-w-4xl flex-col items-center gap-12 text-center md:gap-16">
         <FadeIn y={40}>
-          <span className="mb-4 block text-sm font-medium uppercase tracking-[0.35em] text-[#BBCCD7] sm:text-base">
-            Наша
-          </span>
           <h2
-            className="hero-heading font-black uppercase leading-none tracking-tight"
-            style={{ fontSize: 'clamp(3rem, 10vw, 120px)' }}
+            className="hero-heading font-display font-black leading-none tracking-tight"
+            style={{ fontSize: 'clamp(2.6rem, 9vw, 110px)' }}
           >
             Команда
           </h2>
-          <p className="mx-auto mt-6 max-w-xl font-light leading-relaxed text-[#D7E2EA]/60 sm:text-lg">
+          <p className="mx-auto mt-6 max-w-xl font-normal leading-relaxed text-[#D7E2EA]/60 sm:text-lg">
             Мы сами пишем свои проекты — двое разработчиков из Донецка, чтобы
             каждая идея доезжала до продакшена.
           </p>

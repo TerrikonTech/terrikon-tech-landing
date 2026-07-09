@@ -33,7 +33,7 @@ export default function Footer() {
         <div>
           <div className="flex items-center gap-2.5">
             <LogoMark className="h-7 w-8 bg-[#BBCCD7]" />
-            <span className="text-2xl font-bold tracking-tight text-white">
+            <span className="font-display text-2xl font-bold tracking-tight text-white">
               Террикон
             </span>
           </div>
@@ -91,9 +91,9 @@ export default function Footer() {
       {/* Контурный водяной знак, наполовину срезанный нижним краем */}
       <div
         aria-hidden="true"
-        className="pointer-events-none relative z-0 -mb-[0.12em] select-none whitespace-nowrap text-center font-black uppercase leading-none tracking-tight"
+        className="pointer-events-none relative z-0 -mb-[0.12em] select-none whitespace-nowrap text-center font-display font-black leading-none tracking-tight"
         style={{
-          fontSize: 'clamp(90px, 15.5vw, 300px)',
+          fontSize: 'clamp(58px, 14.5vw, 280px)',
           color: 'transparent',
           WebkitTextStroke: '1.5px rgba(187, 204, 215, 0.4)',
         }}
