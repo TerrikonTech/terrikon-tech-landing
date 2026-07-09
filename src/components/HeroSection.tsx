@@ -4,66 +4,65 @@ import ContactButton from './ContactButton'
 
 const NAV_LINKS = ['About', 'Price', 'Projects', 'Contact']
 
-const PORTRAIT_VIDEO_URL =
-  'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260601_110537_3a579fa0-7bbc-4d94-9d25-0e816c7840f5.mp4'
+// Локальная перекодировка манекена из mainframe-hero: 1080p, all-intra
+// (каждый кадр ключевой) — сик по любому времени декодирует ровно один кадр
+const PORTRAIT_VIDEO_URL = '/portrait-scrub.mp4'
 
-// Логика из mainframe-hero: на десктопе видео скраббится горизонтальным
-// движением мыши, ниже 1024px — обычный автоплей.
+// Логика из mainframe-hero: видео не проигрывается само — кадр мотается
+// только движением мыши. Автоплей остаётся лишь на тач-устройствах,
+// где скраббинг курсором невозможен.
 function ScrubVideo() {
   const videoRef = useRef<HTMLVideoElement>(null)
-  const targetTimeRef = useRef(0)
-  const prevXRef = useRef<number | null>(null)
-  const seekingRef = useRef(false)
 
-  // Desktop mouse scrubbing
   useEffect(() => {
     const video = videoRef.current
     if (!video) return
 
-    const applySeek = () => {
-      if (!video.duration) return
-      seekingRef.current = true
-      video.currentTime = targetTimeRef.current
-    }
-
-    const onSeeked = () => {
-      seekingRef.current = false
-      if (Math.abs(video.currentTime - targetTimeRef.current) > 0.01) {
-        applySeek()
-      }
-    }
-
-    const onMouseMove = (e: MouseEvent) => {
-      if (window.innerWidth < 1024) return
-      if (prevXRef.current === null) {
-        prevXRef.current = e.clientX
-        return
-      }
-      const delta = e.clientX - prevXRef.current
-      prevXRef.current = e.clientX
-      if (!video.duration) return
-      const next =
-        targetTimeRef.current + (delta / window.innerWidth) * 0.8 * video.duration
-      targetTimeRef.current = Math.min(Math.max(next, 0), video.duration)
-      if (!seekingRef.current) applySeek()
-    }
-
-    window.addEventListener('mousemove', onMouseMove)
-    video.addEventListener('seeked', onSeeked)
-    return () => {
-      window.removeEventListener('mousemove', onMouseMove)
-      video.removeEventListener('seeked', onSeeked)
-    }
-  }, [])
-
-  // Mobile autoplay — scrubbing is disabled below 1024px, so play normally
-  useEffect(() => {
-    const video = videoRef.current
-    if (!video) return
-    if (window.innerWidth < 1024) {
+    if (window.matchMedia('(pointer: coarse)').matches) {
       video.autoplay = true
       video.loop = true
       video.play().catch(() => {})
+      return
+    }
+
+    let targetTime = 0
+    let prevX: number | null = null
+    let seeking = false
+    let rafId = 0
+
+    const onSeeked = () => {
+      seeking = false
+    }
+
+    // mousemove только копит целевое время; сам сик — максимум раз в кадр
+    // и только когда предыдущий завершился, иначе очередь сиков душит декодер
+    const onMouseMove = (e: MouseEvent) => {
+      if (prevX === null) {
+        prevX = e.clientX
+        return
+      }
+      const delta = e.clientX - prevX
+      prevX = e.clientX
+      if (!video.duration) return
+      const next = targetTime + (delta / window.innerWidth) * 0.8 * video.duration
+      targetTime = Math.min(Math.max(next, 0), video.duration)
+    }
+
+    const tick = () => {
+      rafId = requestAnimationFrame(tick)
+      if (seeking || !video.duration) return
+      if (Math.abs(targetTime - video.currentTime) < 1 / 30) return
+      seeking = true
+      video.currentTime = targetTime
+    }
+
+    window.addEventListener('mousemove', onMouseMove, { passive: true })
+    video.addEventListener('seeked', onSeeked)
+    rafId = requestAnimationFrame(tick)
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove)
+      video.removeEventListener('seeked', onSeeked)
+      cancelAnimationFrame(rafId)
     }
   }, [])
 
