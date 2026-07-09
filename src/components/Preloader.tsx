@@ -30,7 +30,7 @@ export default function Preloader() {
       }`}
       aria-hidden={phase === 'fading'}
     >
-      <TetrisLoading size="md" speed="normal" loadingText="Загрузка..." />
+      <TetrisLoading size="md" speed="normal" showLoadingText={false} />
     </div>
   )
 }
