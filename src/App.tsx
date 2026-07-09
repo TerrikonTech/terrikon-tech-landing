@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import Preloader from './components/Preloader'
-import DockNav from './components/DockNav'
 import HeroSection from './components/HeroSection'
 import MarqueeSection from './components/MarqueeSection'
 import AboutSection from './components/AboutSection'
@@ -24,11 +23,7 @@ export default function App() {
       style={{ overflowX: 'clip' }}
     >
       <Preloader />
-      <DockNav
-        darkTheme={darkTheme}
-        onToggleTheme={() => setDarkTheme((v) => !v)}
-      />
-      <HeroSection darkTheme={darkTheme} />
+      <HeroSection darkTheme={darkTheme} onToggleTheme={setDarkTheme} />
       <MarqueeSection />
       <AboutSection />
       <ServicesSection />

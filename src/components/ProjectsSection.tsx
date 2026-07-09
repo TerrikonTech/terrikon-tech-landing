@@ -8,33 +8,17 @@ interface Project {
   number: string
   name: string
   category: string
-  col1Images: [string, string]
-  col2Image: string
+  media: string
 }
 
-// Медиа карточек — живые GIF-превью из секции-марки (второй блок)
+// Одна карточка — один живой GIF-превью из секции-марки;
+// названия подобраны под содержимое роликов
 const PROJECTS: Project[] = [
-  {
-    number: '01',
-    name: 'Nextlevel Studio',
-    category: 'Клиент',
-    col1Images: [MARQUEE_IMAGES[0], MARQUEE_IMAGES[1]],
-    col2Image: MARQUEE_IMAGES[2],
-  },
-  {
-    number: '02',
-    name: 'Aura Brand Identity',
-    category: 'Личный',
-    col1Images: [MARQUEE_IMAGES[3], MARQUEE_IMAGES[4]],
-    col2Image: MARQUEE_IMAGES[5],
-  },
-  {
-    number: '03',
-    name: 'Solaris Digital',
-    category: 'Клиент',
-    col1Images: [MARQUEE_IMAGES[6], MARQUEE_IMAGES[7]],
-    col2Image: MARQUEE_IMAGES[8],
-  },
+  { number: '01', name: 'Space Voyage', category: 'Клиент', media: MARQUEE_IMAGES[0] },
+  { number: '02', name: 'CodeNest', category: 'Клиент', media: MARQUEE_IMAGES[1] },
+  { number: '03', name: 'Vex Ventures', category: 'Личный', media: MARQUEE_IMAGES[2] },
+  { number: '04', name: 'Stellar AI', category: 'Клиент', media: MARQUEE_IMAGES[3] },
+  { number: '05', name: 'ASME', category: 'Личный', media: MARQUEE_IMAGES[4] },
 ]
 
 interface ProjectCardProps {
@@ -54,55 +38,38 @@ function ProjectCard({ project, index, totalCards, progress }: ProjectCardProps)
         className="relative rounded-[40px] border-2 border-[#D7E2EA] bg-[#0C0C0C] p-4 sm:rounded-[50px] sm:p-6 md:rounded-[60px] md:p-8"
         style={{ scale, top: `${index * 28}px` }}
       >
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="flex items-center gap-4 sm:gap-6 md:gap-8">
-              <span
-                className="font-black leading-none text-[#D7E2EA]"
-                style={{ fontSize: 'clamp(3rem, 10vw, 140px)' }}
-              >
-                {project.number}
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-4 sm:gap-6 md:gap-8">
+            <span
+              className="font-black leading-none text-[#D7E2EA]"
+              style={{ fontSize: 'clamp(3rem, 10vw, 140px)' }}
+            >
+              {project.number}
+            </span>
+            <div className="flex flex-col">
+              <span className="text-xs font-light uppercase tracking-widest text-[#D7E2EA] opacity-60 sm:text-sm">
+                {project.category}
               </span>
-              <div className="flex flex-col">
-                <span className="text-xs font-light uppercase tracking-widest text-[#D7E2EA] opacity-60 sm:text-sm">
-                  {project.category}
-                </span>
-                <h3
-                  className="font-medium uppercase text-[#D7E2EA]"
-                  style={{ fontSize: 'clamp(1.1rem, 2.4vw, 2.2rem)' }}
-                >
-                  {project.name}
-                </h3>
-              </div>
+              <h3
+                className="font-medium uppercase text-[#D7E2EA]"
+                style={{ fontSize: 'clamp(1.1rem, 2.4vw, 2.2rem)' }}
+              >
+                {project.name}
+              </h3>
             </div>
-            <LiveProjectButton />
           </div>
+          <LiveProjectButton />
+        </div>
 
-          <div className="mt-4 flex gap-3 sm:mt-6 sm:gap-4 md:mt-8">
-            <div className="flex w-[40%] flex-col gap-3 sm:gap-4">
-              <img
-                src={project.col1Images[0]}
-                alt={`${project.name} — превью 1`}
-                loading="lazy"
-                className="w-full rounded-[40px] object-cover sm:rounded-[50px] md:rounded-[60px]"
-                style={{ height: 'clamp(130px, 16vw, 230px)' }}
-              />
-              <img
-                src={project.col1Images[1]}
-                alt={`${project.name} — превью 2`}
-                loading="lazy"
-                className="w-full rounded-[40px] object-cover sm:rounded-[50px] md:rounded-[60px]"
-                style={{ height: 'clamp(160px, 22vw, 340px)' }}
-              />
-            </div>
-            <div className="w-[60%]">
-              <img
-                src={project.col2Image}
-                alt={`${project.name} — превью 3`}
-                loading="lazy"
-                className="h-full w-full rounded-[40px] object-cover sm:rounded-[50px] md:rounded-[60px]"
-              />
-            </div>
-          </div>
+        <div className="mt-4 sm:mt-6 md:mt-8">
+          <img
+            src={project.media}
+            alt={`${project.name} — превью проекта`}
+            loading="lazy"
+            className="w-full rounded-[40px] object-cover sm:rounded-[50px] md:rounded-[60px]"
+            style={{ height: 'clamp(240px, 34vw, 440px)' }}
+          />
+        </div>
       </motion.div>
     </div>
   )
