@@ -1,14 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import FadeIn from './FadeIn'
 import ContactButton from './ContactButton'
-import ThemeSwitch from './ThemeSwitch'
-
-const NAV_LINKS = [
-  { label: 'Обо мне', href: '#about' },
-  { label: 'Цены', href: '#price' },
-  { label: 'Проекты', href: '#projects' },
-  { label: 'Контакт', href: '#contact' },
-]
 
 // Локальные перекодировки: 1080p, all-intra (каждый кадр ключевой) —
 // сик по любому времени декодирует ровно один кадр.
@@ -89,21 +81,18 @@ function ScrubVideo({ src }: { src: string }) {
   )
 }
 
-export default function HeroSection() {
-  const [darkTheme, setDarkTheme] = useState(
-    () => localStorage.getItem('jack-theme') === 'dark',
-  )
+interface HeroSectionProps {
+  darkTheme: boolean
+}
 
-  useEffect(() => {
-    localStorage.setItem('jack-theme', darkTheme ? 'dark' : 'light')
-  }, [darkTheme])
-
-  // В светлой теме фон видео на lg светлый — текст hero затемняется;
+export default function HeroSection({ darkTheme }: HeroSectionProps) {
+  // В светлой теме фон видео на lg светлый — лейбл кнопки затемняется;
   // в тёмной (лама на чёрном) текст остаётся светлым на всех ширинах
   const onLightBg = !darkTheme
 
   return (
     <section
+      id="top"
       className="relative flex h-screen flex-col"
       style={{ overflowX: 'clip' }}
     >
@@ -113,44 +102,7 @@ export default function HeroSection() {
       />
 
       <div className="relative z-[5] flex flex-1 flex-col">
-        <FadeIn delay={0} y={-20}>
-          <nav className="flex items-center justify-between px-6 pt-6 md:px-10 md:pt-8">
-            {NAV_LINKS.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className={`whitespace-nowrap text-[11px] font-medium uppercase tracking-wider text-[#D7E2EA] transition-opacity duration-200 hover:opacity-70 sm:text-sm md:text-lg lg:text-[1.4rem] ${onLightBg ? 'lg:text-[#0C0C0C]' : ''}`}
-              >
-                {link.label}
-              </a>
-            ))}
-            <ThemeSwitch
-              checked={darkTheme}
-              onChange={setDarkTheme}
-              onLightBg={onLightBg}
-            />
-          </nav>
-        </FadeIn>
-
-        <div className="overflow-hidden">
-          <FadeIn delay={0.15} y={40}>
-            <h1
-              className={`hero-heading ${onLightBg ? 'hero-heading-on-video' : ''} mt-6 w-full whitespace-nowrap text-center text-[10.8vw] font-black uppercase leading-none tracking-tight sm:mt-4 sm:text-[11.5vw] md:-mt-5 md:text-[12.3vw] lg:text-[13.4vw]`}
-            >
-              Хай, я Джек
-            </h1>
-          </FadeIn>
-        </div>
-
-        <div className="mt-auto flex items-end justify-between px-6 pb-7 sm:pb-8 md:px-10 md:pb-10">
-          <FadeIn delay={0.35} y={20}>
-            <p
-              className={`max-w-[160px] font-light uppercase leading-snug tracking-wide text-[#D7E2EA] sm:max-w-[220px] md:max-w-[260px] ${onLightBg ? 'lg:text-[#0C0C0C]' : ''}`}
-              style={{ fontSize: 'clamp(0.75rem, 1.4vw, 1.5rem)' }}
-            >
-              3D-художник, одержимый созданием ярких и незабываемых проектов
-            </p>
-          </FadeIn>
+        <div className="mt-auto flex items-end justify-end px-6 pb-7 sm:pb-8 md:px-10 md:pb-10">
           <FadeIn delay={0.5} y={20}>
             <ContactButton onLightBg={onLightBg} />
           </FadeIn>

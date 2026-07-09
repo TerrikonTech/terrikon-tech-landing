@@ -24,13 +24,3 @@ body {
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
-
-/* Тёмный вариант градиента для hero: с lg заголовок лежит на светлом
-   фоне видео (логика mainframe-hero), светлый градиент там нечитаем */
-@media (min-width: 1024px) {
-  .hero-heading-on-video {
-    background: linear-gradient(180deg, #14161a 0%, #4c545e 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-  }
-}
