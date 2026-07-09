@@ -14,6 +14,11 @@ export default function ContactButton({ onLightBg = false }: ContactButtonProps)
   return (
     <button
       type="button"
+      onClick={() =>
+        document
+          .querySelector('#contact')
+          ?.scrollIntoView({ behavior: 'smooth' })
+      }
       className="relative inline-flex origin-center cursor-pointer select-none items-center justify-center rounded-full border-0 bg-transparent px-8 py-3 outline-none transition-transform duration-[400ms] ease-[cubic-bezier(0.4,1.5,0.3,1)] hover:scale-[1.03] active:scale-[0.96] sm:px-10 sm:py-3.5 md:px-12 md:py-4"
       style={
         {

@@ -1,7 +1,6 @@
 import { useRef } from 'react'
 import { motion, useScroll, useTransform, type MotionValue } from 'framer-motion'
 import FadeIn from './FadeIn'
-import LiveProjectButton from './LiveProjectButton'
 import { MARQUEE_IMAGES } from './MarqueeSection'
 
 interface Project {
@@ -58,7 +57,6 @@ function ProjectCard({ project, index, totalCards, progress }: ProjectCardProps)
               </h3>
             </div>
           </div>
-          <LiveProjectButton />
         </div>
 
         <div className="mt-4 sm:mt-6 md:mt-8">

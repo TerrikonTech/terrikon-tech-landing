@@ -7,7 +7,7 @@ const NAV_COLUMNS = [
   {
     title: 'О нас',
     links: [
-      { label: 'Обо мне', href: '#about' },
+      { label: 'О студии', href: '#about' },
       { label: 'Команда', href: '#team' },
       { label: 'Проекты', href: '#projects' },
     ],
@@ -31,7 +31,7 @@ export default function Footer() {
         {/* Лого + описание */}
         <div>
           <div className="flex items-center gap-2.5">
-            <Mountain className="h-7 w-7 text-[#B600A8]" strokeWidth={2.2} />
+            <Mountain className="h-7 w-7 text-[#BBCCD7]" strokeWidth={2.2} />
             <span className="text-2xl font-bold tracking-tight text-white">
               Террикон
             </span>
@@ -71,7 +71,7 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 className="flex items-center gap-2.5 text-sm text-[#D7E2EA]/60 transition-colors hover:text-white"
               >
-                <Send className="h-4 w-4 text-[#B600A8]" />
+                <Send className="h-4 w-4 text-[#BBCCD7]" />
                 Телеграм
               </a>
             </li>
@@ -81,16 +81,7 @@ export default function Footer() {
 
       <div className="relative z-10 mx-auto mt-16 max-w-6xl border-t border-white/10" />
 
-      <div className="relative z-10 mx-auto flex max-w-6xl items-center justify-between gap-4 py-8">
-        <a
-          href="https://t.me/Zotov_O"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Телеграм"
-          className="text-[#D7E2EA]/50 transition-colors hover:text-white"
-        >
-          <Send className="h-5 w-5" />
-        </a>
+      <div className="relative z-10 mx-auto flex max-w-6xl items-center justify-end py-8">
         <p className="text-xs text-[#D7E2EA]/40 sm:text-sm">
           © 2026 Террикон. Все права защищены.
         </p>
@@ -99,11 +90,11 @@ export default function Footer() {
       {/* Контурный водяной знак, наполовину срезанный нижним краем */}
       <div
         aria-hidden="true"
-        className="pointer-events-none relative z-0 -mb-[0.42em] select-none whitespace-nowrap text-center font-black uppercase leading-none tracking-tight"
+        className="pointer-events-none relative z-0 -mb-[0.12em] select-none whitespace-nowrap text-center font-black uppercase leading-none tracking-tight"
         style={{
           fontSize: 'clamp(90px, 15.5vw, 300px)',
           color: 'transparent',
-          WebkitTextStroke: '1.5px rgba(182, 0, 168, 0.45)',
+          WebkitTextStroke: '1.5px rgba(187, 204, 215, 0.4)',
         }}
       >
         Террикон

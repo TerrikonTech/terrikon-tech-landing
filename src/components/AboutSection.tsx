@@ -6,7 +6,7 @@ const FIGMA_BASE =
   'https://shrug-person-78902957.figma.site/_components/v2/ebb2b8f25d8e24d5f0a5ca8af4c950de81aa2fd7'
 
 const ABOUT_TEXT =
-  'Больше пяти лет в дизайне: занимаюсь брендингом, веб-дизайном и пользовательским опытом. Люблю работать с бизнесом, который хочет выделяться и показывать себя с лучшей стороны. Давай создадим что-то невероятное вместе!'
+  'Мы — Террикон, студия разработки из Донецка. Сами доводим каждый проект от идеи до продакшена: сайты, приложения, 3D и моушн. Работаем с теми, кто хочет выделяться и показывать себя с лучшей стороны. Давайте создадим что-то невероятное вместе!'
 
 export default function AboutSection() {
   return (
@@ -75,7 +75,7 @@ export default function AboutSection() {
               className="hero-heading text-center font-black uppercase leading-none tracking-tight"
               style={{ fontSize: 'clamp(3rem, 12vw, 160px)' }}
             >
-              Обо мне
+              О нас
             </h2>
           </FadeIn>
           <AnimatedText
