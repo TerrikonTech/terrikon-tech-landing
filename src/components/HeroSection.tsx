@@ -4,7 +4,7 @@ import ContactButton from './ContactButton'
 import ThemeSwitch from './ThemeSwitch'
 
 const NAV_LINKS = [
-  { label: 'Обо мне', href: '#about' },
+  { label: 'О нас', href: '#about' },
   { label: 'Цены', href: '#price' },
   { label: 'Проекты', href: '#projects' },
   { label: 'Контакт', href: '#contact' },
