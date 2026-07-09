@@ -3,7 +3,12 @@ import FadeIn from './FadeIn'
 import ContactButton from './ContactButton'
 import ThemeSwitch from './ThemeSwitch'
 
-const NAV_LINKS = ['About', 'Price', 'Projects', 'Contact']
+const NAV_LINKS = [
+  { label: 'Обо мне', href: '#about' },
+  { label: 'Цены', href: '#price' },
+  { label: 'Проекты', href: '#projects' },
+  { label: 'Контакт', href: '#contact' },
+]
 
 // Локальные перекодировки: 1080p, all-intra (каждый кадр ключевой) —
 // сик по любому времени декодирует ровно один кадр.
@@ -77,7 +82,7 @@ function ScrubVideo({ src }: { src: string }) {
         playsInline
         preload="auto"
         src={src}
-        aria-label="Jack — 3D creator portrait"
+        aria-label="Джек — видео-портрет 3D-художника"
         className="h-full w-full object-cover object-right lg:object-right-bottom"
       />
     </div>
@@ -112,11 +117,11 @@ export default function HeroSection() {
           <nav className="flex items-center justify-between px-6 pt-6 md:px-10 md:pt-8">
             {NAV_LINKS.map((link) => (
               <a
-                key={link}
-                href={`#${link.toLowerCase()}`}
-                className={`text-sm font-medium uppercase tracking-wider text-[#D7E2EA] transition-opacity duration-200 hover:opacity-70 md:text-lg lg:text-[1.4rem] ${onLightBg ? 'lg:text-[#0C0C0C]' : ''}`}
+                key={link.href}
+                href={link.href}
+                className={`whitespace-nowrap text-[11px] font-medium uppercase tracking-wider text-[#D7E2EA] transition-opacity duration-200 hover:opacity-70 sm:text-sm md:text-lg lg:text-[1.4rem] ${onLightBg ? 'lg:text-[#0C0C0C]' : ''}`}
               >
-                {link}
+                {link.label}
               </a>
             ))}
             <ThemeSwitch
@@ -130,9 +135,9 @@ export default function HeroSection() {
         <div className="overflow-hidden">
           <FadeIn delay={0.15} y={40}>
             <h1
-              className={`hero-heading ${onLightBg ? 'hero-heading-on-video' : ''} mt-6 w-full whitespace-nowrap text-center text-[14vw] font-black uppercase leading-none tracking-tight sm:mt-4 sm:text-[15vw] md:-mt-5 md:text-[16vw] lg:text-[17.5vw]`}
+              className={`hero-heading ${onLightBg ? 'hero-heading-on-video' : ''} mt-6 w-full whitespace-nowrap text-center text-[10.8vw] font-black uppercase leading-none tracking-tight sm:mt-4 sm:text-[11.5vw] md:-mt-5 md:text-[12.3vw] lg:text-[13.4vw]`}
             >
-              Hi, i&apos;m jack
+              Хай, я Джек
             </h1>
           </FadeIn>
         </div>
@@ -143,12 +148,11 @@ export default function HeroSection() {
               className={`max-w-[160px] font-light uppercase leading-snug tracking-wide text-[#D7E2EA] sm:max-w-[220px] md:max-w-[260px] ${onLightBg ? 'lg:text-[#0C0C0C]' : ''}`}
               style={{ fontSize: 'clamp(0.75rem, 1.4vw, 1.5rem)' }}
             >
-              a 3d creator driven by crafting striking and unforgettable
-              projects
+              3D-художник, одержимый созданием ярких и незабываемых проектов
             </p>
           </FadeIn>
           <FadeIn delay={0.5} y={20}>
-            <ContactButton />
+            <ContactButton onLightBg={onLightBg} />
           </FadeIn>
         </div>
       </div>

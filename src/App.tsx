@@ -7,7 +7,7 @@ import ProjectsSection from './components/ProjectsSection'
 export default function App() {
   return (
     <main
-      className="min-h-screen bg-[#0C0C0C] font-kanit"
+      className="min-h-screen bg-[#0C0C0C] font-display"
       style={{ overflowX: 'clip' }}
     >
       <HeroSection />

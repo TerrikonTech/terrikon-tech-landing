@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Moon } from 'lucide-react'
+import { Moon, Sun } from 'lucide-react'
 
 interface ThemeSwitchProps {
   checked: boolean
@@ -8,24 +8,32 @@ interface ThemeSwitchProps {
   onLightBg: boolean
 }
 
-// Тумблер в духе shadcn Switch + Label (ShadcnStudio/switch-1),
-// собран руками: в проекте нет radix/shadcn-инфраструктуры
+// Тумблер в духе shadcn Switch (ShadcnStudio/switch-1), собран руками:
+// солнце слева от ползунка, луна справа, без текстового лейбла
 export default function ThemeSwitch({
   checked,
   onChange,
   onLightBg,
 }: ThemeSwitchProps) {
+  const iconBase =
+    'h-3.5 w-3.5 transition-opacity duration-200 sm:h-4 sm:w-4 md:h-5 md:w-5 text-[#D7E2EA]'
+  const darkOnLg = onLightBg ? 'lg:text-[#0C0C0C]' : ''
+
   return (
     <button
       type="button"
       role="switch"
       aria-checked={checked}
-      aria-label="Toggle dark theme"
+      aria-label="Переключить тёмную тему"
       onClick={() => onChange(!checked)}
-      className="flex items-center gap-2"
+      className="flex shrink-0 items-center gap-1.5 sm:gap-2"
     >
+      <Sun
+        strokeWidth={2}
+        className={`${iconBase} ${darkOnLg} ${checked ? 'opacity-40' : 'opacity-100'}`}
+      />
       <span
-        className={`flex h-5 w-9 items-center rounded-full p-0.5 transition-colors duration-200 ${
+        className={`flex h-4 w-7 items-center rounded-full p-0.5 transition-colors duration-200 sm:h-5 sm:w-9 ${
           checked
             ? 'justify-end bg-[#B600A8]'
             : `justify-start bg-[#D7E2EA]/30 ${onLightBg ? 'lg:bg-[#0C0C0C]/25' : ''}`
@@ -34,17 +42,13 @@ export default function ThemeSwitch({
         <motion.span
           layout
           transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-          className="h-4 w-4 rounded-full bg-white shadow-sm"
+          className="h-3 w-3 rounded-full bg-white shadow-sm sm:h-4 sm:w-4"
         />
       </span>
-      <span
-        className={`flex items-center gap-1 text-sm font-medium uppercase tracking-wider text-[#D7E2EA] md:text-lg lg:text-[1.4rem] ${
-          onLightBg && !checked ? 'lg:text-[#0C0C0C]' : ''
-        }`}
-      >
-        <Moon className="h-[1em] w-[1em]" strokeWidth={2} />
-        Dark
-      </span>
+      <Moon
+        strokeWidth={2}
+        className={`${iconBase} ${darkOnLg} ${checked ? 'opacity-100' : 'opacity-40'}`}
+      />
     </button>
   )
 }

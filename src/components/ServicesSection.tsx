@@ -3,33 +3,33 @@ import FadeIn from './FadeIn'
 const SERVICES = [
   {
     number: '01',
-    name: '3D Modeling',
+    name: '3D-моделирование',
     description:
-      'Creation of detailed objects, characters, or environments tailored to specific client needs, ideal for games, products, and visualizations.',
+      'Детализированные объекты, персонажи и окружения под задачи клиента — для игр, продуктов и визуализаций.',
   },
   {
     number: '02',
-    name: 'Rendering',
+    name: 'Рендеринг',
     description:
-      'High-quality, photorealistic renders that showcase designs with custom lighting, textures, and materials to bring concepts to life.',
+      'Фотореалистичные рендеры с постановкой света, текстурами и материалами, которые оживляют концепты.',
   },
   {
     number: '03',
-    name: 'Motion Design',
+    name: 'Моушн-дизайн',
     description:
-      'Dynamic animations and motion graphics that add energy and storytelling to brands, products, and digital experiences.',
+      'Динамичные анимации и моушн-графика, которые добавляют брендам и продуктам энергию и историю.',
   },
   {
     number: '04',
-    name: 'Branding',
+    name: 'Брендинг',
     description:
-      'Crafting cohesive visual identities — from logos to full brand systems — that communicate a clear and memorable presence.',
+      'Цельные визуальные айдентики — от логотипа до полного брендбука — с ясным и запоминающимся образом.',
   },
   {
     number: '05',
-    name: 'Web Design',
+    name: 'Веб-дизайн',
     description:
-      'Designing clean, modern, and conversion-focused websites with attention to layout, typography, and user experience.',
+      'Чистые, современные и конверсионные сайты с вниманием к вёрстке, типографике и пользовательскому опыту.',
   },
 ]
 
@@ -44,7 +44,7 @@ export default function ServicesSection() {
           className="mb-16 text-center font-black uppercase leading-none tracking-tight text-[#0C0C0C] sm:mb-20 md:mb-28"
           style={{ fontSize: 'clamp(3rem, 12vw, 160px)' }}
         >
-          Services
+          Услуги
         </h2>
       </FadeIn>
 
