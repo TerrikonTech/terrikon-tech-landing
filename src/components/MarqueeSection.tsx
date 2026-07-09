@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 
-const IMAGES = [
+export const MARQUEE_IMAGES = [
   'https://motionsites.ai/assets/hero-space-voyage-preview-eECLH3Yc.gif',
   'https://motionsites.ai/assets/hero-codenest-preview-Cgppc2qV.gif',
   'https://motionsites.ai/assets/hero-vex-ventures-preview-BczMFIiw.gif',
@@ -24,8 +24,8 @@ const IMAGES = [
   'https://motionsites.ai/assets/hero-celestia-preview-0yO3jXO8.gif',
 ]
 
-const ROW_1 = IMAGES.slice(0, 11)
-const ROW_2 = IMAGES.slice(11)
+const ROW_1 = MARQUEE_IMAGES.slice(0, 11)
+const ROW_2 = MARQUEE_IMAGES.slice(11)
 
 interface MarqueeRowProps {
   images: string[]

@@ -6,7 +6,7 @@ const FIGMA_BASE =
   'https://shrug-person-78902957.figma.site/_components/v2/ebb2b8f25d8e24d5f0a5ca8af4c950de81aa2fd7'
 
 const ABOUT_TEXT =
-  "With more than five years of experience in design, i focus on branding, web design, and user experience, i truly enjoy working with businesses that aim to stand out and present their best image. Let's build something incredible together!"
+  'Больше пяти лет в дизайне: занимаюсь брендингом, веб-дизайном и пользовательским опытом. Люблю работать с бизнесом, который хочет выделяться и показывать себя с лучшей стороны. Давай создадим что-то невероятное вместе!'
 
 export default function AboutSection() {
   return (
@@ -75,7 +75,7 @@ export default function AboutSection() {
               className="hero-heading text-center font-black uppercase leading-none tracking-tight"
               style={{ fontSize: 'clamp(3rem, 12vw, 160px)' }}
             >
-              About me
+              Обо мне
             </h2>
           </FadeIn>
           <AnimatedText
