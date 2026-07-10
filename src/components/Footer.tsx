@@ -90,12 +90,17 @@ export default function Footer() {
         </p>
       </div>
 
-      {/* Контурный водяной знак, наполовину срезанный нижним краем */}
+      {/* Контурный водяной знак, наполовину срезанный нижним краем.
+          Размер от вьюпорта (слово «Террикон» в Unbounded ≈ 5.64em шириной →
+          18vw даёт edge-to-edge с лёгким bleed); срез — фикс. высотой бокса
+          0.66em, а не отрицательным margin: не зависит от метрик шрифта
+          и одинаков на мобиле и десктопе */}
       <div
         aria-hidden="true"
-        className="pointer-events-none relative z-0 -mb-[0.12em] select-none whitespace-nowrap text-center font-display font-black leading-none tracking-tight"
+        className="pointer-events-none relative z-0 -mx-6 select-none overflow-hidden whitespace-nowrap text-center font-display font-black leading-none tracking-tight sm:-mx-10 md:-mx-16"
         style={{
-          fontSize: 'clamp(58px, 14.5vw, 280px)',
+          fontSize: 'min(18vw, 280px)',
+          height: '0.66em',
           color: 'transparent',
           WebkitTextStroke: '1.5px rgba(187, 204, 215, 0.4)',
         }}

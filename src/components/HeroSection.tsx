@@ -85,7 +85,11 @@ function ScrubVideo({ src, dark }: { src: string; dark: boolean }) {
           preload="auto"
           src={src}
           aria-label="Джек — видео-портрет 3D-художника"
-          className="h-full w-full object-cover object-right lg:object-right-bottom"
+          className={`h-full w-full object-cover lg:object-right-bottom ${
+            // мобильный кроп: лама стоит в центре кадра, манекен — правее (~68%);
+            // общий object-right резал ламу пополам
+            dark ? 'object-center' : 'object-[68%_50%]'
+          }`}
         />
       </div>
       <SubjectKeyCanvas videoRef={videoRef} dark={dark} />

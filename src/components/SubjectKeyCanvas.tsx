@@ -12,6 +12,13 @@ import { useEffect, useRef, type RefObject } from 'react'
 const KEY_LIGHT = { key: [0.945, 0.941, 0.976], thresh: [0.05, 0.14] }
 const KEY_DARK = { key: [0.01, 0.01, 0.024], thresh: [0.03, 0.085] }
 
+// Кеинг по цвету дырявит фигуру там, где она совпадает с фоном (блики на
+// манекене, тёмные уши ламы) — буквы просвечивали сквозь головы. Страховка:
+// статичная маска силуэта (scratchpad/build_masks.py: flood-fill фона по
+// низкому градиенту на 9 кадрах скраба → пересечение → эрозия → растушёвка),
+// в шейдере берём max(кеинг, маска).
+const MASK_SRC = { light: '/subject-mask-light.png', dark: '/subject-mask-dark.png' }
+
 const VERT = `
 attribute vec2 aPos;
 varying vec2 vUV;
@@ -24,6 +31,7 @@ const FRAG = `
 precision mediump float;
 varying vec2 vUV;
 uniform sampler2D uTex;
+uniform sampler2D uMask;
 uniform vec2 uScale;
 uniform vec2 uOffset;
 uniform vec3 uKey;
@@ -32,7 +40,7 @@ void main() {
   vec2 uv = vUV * uScale + uOffset;
   vec4 c = texture2D(uTex, uv);
   float d = distance(c.rgb, uKey) / 1.7320508;
-  float a = smoothstep(uThresh.x, uThresh.y, d);
+  float a = max(smoothstep(uThresh.x, uThresh.y, d), texture2D(uMask, uv).r);
   gl_FragColor = vec4(c.rgb * a, a);
 }`
 
@@ -91,15 +99,37 @@ export default function SubjectKeyCanvas({
       gl.enableVertexAttribArray(aPos)
       gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0)
 
-      const tex = gl.createTexture()
-      gl.bindTexture(gl.TEXTURE_2D, tex)
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+      const setupTex = (unit: number) => {
+        const t = gl.createTexture()
+        gl.activeTexture(gl.TEXTURE0 + unit)
+        gl.bindTexture(gl.TEXTURE_2D, t)
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+        return t
+      }
+      // юнит 1 — маска силуэта; до загрузки — 1×1 чёрный (вклад нулевой)
+      const maskTex = setupTex(1)
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.LUMINANCE, 1, 1, 0, gl.LUMINANCE,
+        gl.UNSIGNED_BYTE, new Uint8Array([0]))
+      const maskImg = new Image()
+      maskImg.onload = () => {
+        if (!cleanupGL) return
+        gl.activeTexture(gl.TEXTURE1)
+        gl.bindTexture(gl.TEXTURE_2D, maskTex)
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.LUMINANCE, gl.LUMINANCE,
+          gl.UNSIGNED_BYTE, maskImg)
+        // вернуть активный юнит: tick заливает кадры видео в юнит 0
+        gl.activeTexture(gl.TEXTURE0)
+      }
+      maskImg.src = MASK_SRC[dark ? 'dark' : 'light']
+      // юнит 0 — кадр видео (активным остаётся он: tick заливает сюда)
+      const tex = setupTex(0)
 
       const { key, thresh } = dark ? KEY_DARK : KEY_LIGHT
       gl.uniform1i(gl.getUniformLocation(prog, 'uTex'), 0)
+      gl.uniform1i(gl.getUniformLocation(prog, 'uMask'), 1)
       gl.uniform3fv(gl.getUniformLocation(prog, 'uKey'), key)
       gl.uniform2fv(gl.getUniformLocation(prog, 'uThresh'), thresh)
       const uScale = gl.getUniformLocation(prog, 'uScale')
@@ -147,8 +177,10 @@ export default function SubjectKeyCanvas({
         cancelAnimationFrame(rafId)
         ro.disconnect()
         video.removeEventListener('loadedmetadata', updateCover)
+        maskImg.onload = null
         gl.deleteProgram(prog)
         gl.deleteTexture(tex)
+        gl.deleteTexture(maskTex)
         gl.deleteBuffer(buf)
       }
     }
