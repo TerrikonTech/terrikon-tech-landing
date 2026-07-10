@@ -65,7 +65,12 @@ void main() {
     float f = clamp(uFrame, 0.0, 39.0);
     float i0 = floor(f);
     float m = mix(atlasMask(uv, i0), atlasMask(uv, min(i0 + 1.0, 39.0)), f - i0);
-    a = smoothstep(0.3, 0.7, m);
+    // Внутри фигуры — сплошняк; в тонком поясе кромки альфа по яркости:
+    // шерстинки светлые — непрозрачны, чёрный фон между/за ними — нет.
+    // Иначе растушёванный край маски рисует чёрную обводку поверх букв.
+    float luma = dot(c.rgb, vec3(0.299, 0.587, 0.114));
+    a = max(smoothstep(0.62, 0.85, m),
+            smoothstep(0.18, 0.45, m) * smoothstep(0.1, 0.26, luma));
   } else {
     // Светлая: кеинг даёт точную кромку глянца, маска страхует от дыр
     float d = distance(c.rgb, uKey) / 1.7320508;
