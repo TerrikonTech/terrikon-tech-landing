@@ -36,11 +36,17 @@ uniform vec2 uScale;
 uniform vec2 uOffset;
 uniform vec3 uKey;
 uniform vec2 uThresh;
+uniform float uMaskOnly;
 void main() {
   vec2 uv = vUV * uScale + uOffset;
   vec4 c = texture2D(uTex, uv);
   float d = distance(c.rgb, uKey) / 1.7320508;
-  float a = max(smoothstep(uThresh.x, uThresh.y, d), texture2D(uMask, uv).r);
+  float m = texture2D(uMask, uv).r;
+  // uMaskOnly=1 (тёмная тема): кеинг тёмного ворса по тёмному фону даёт
+  // рваную грязную бахрому поверх букв — режем только гладкой маской,
+  // smoothstep дожимает её билинейную кромку на полном разрешении
+  float a = mix(max(smoothstep(uThresh.x, uThresh.y, d), m),
+                smoothstep(0.35, 0.7, m), uMaskOnly);
   gl_FragColor = vec4(c.rgb * a, a);
 }`
 
@@ -130,6 +136,7 @@ export default function SubjectKeyCanvas({
       const { key, thresh } = dark ? KEY_DARK : KEY_LIGHT
       gl.uniform1i(gl.getUniformLocation(prog, 'uTex'), 0)
       gl.uniform1i(gl.getUniformLocation(prog, 'uMask'), 1)
+      gl.uniform1f(gl.getUniformLocation(prog, 'uMaskOnly'), dark ? 1 : 0)
       gl.uniform3fv(gl.getUniformLocation(prog, 'uKey'), key)
       gl.uniform2fv(gl.getUniformLocation(prog, 'uThresh'), thresh)
       const uScale = gl.getUniformLocation(prog, 'uScale')
