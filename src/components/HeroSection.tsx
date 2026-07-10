@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import FadeIn from './FadeIn'
 import ContactButton from './ContactButton'
+import SubjectKeyCanvas from './SubjectKeyCanvas'
 import ThemeSwitch from './ThemeSwitch'
 import LogoMark from './LogoMark'
 
@@ -19,7 +20,7 @@ const PORTRAIT_VIDEO_DARK = '/portrait-scrub-dark.mp4'
 // Логика из mainframe-hero: видео не проигрывается само — кадр мотается
 // только движением мыши. Автоплей остаётся лишь на тач-устройствах,
 // где скраббинг курсором невозможен.
-function ScrubVideo({ src }: { src: string }) {
+function ScrubVideo({ src, dark }: { src: string; dark: boolean }) {
   const videoRef = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
@@ -75,17 +76,20 @@ function ScrubVideo({ src }: { src: string }) {
   }, [])
 
   return (
-    <div className="pointer-events-none relative order-last w-full overflow-hidden aspect-square md:aspect-video lg:absolute lg:inset-0 lg:z-0 lg:order-none lg:aspect-auto lg:h-full">
-      <video
-        ref={videoRef}
-        muted
-        playsInline
-        preload="auto"
-        src={src}
-        aria-label="Джек — видео-портрет 3D-художника"
-        className="h-full w-full object-cover object-right lg:object-right-bottom"
-      />
-    </div>
+    <>
+      <div className="pointer-events-none relative order-last w-full overflow-hidden aspect-square md:aspect-video lg:absolute lg:inset-0 lg:z-0 lg:order-none lg:aspect-auto lg:h-full">
+        <video
+          ref={videoRef}
+          muted
+          playsInline
+          preload="auto"
+          src={src}
+          aria-label="Джек — видео-портрет 3D-художника"
+          className="h-full w-full object-cover object-right lg:object-right-bottom"
+        />
+      </div>
+      <SubjectKeyCanvas videoRef={videoRef} dark={dark} />
+    </>
   )
 }
 
@@ -105,16 +109,20 @@ export default function HeroSection({
   return (
     <section
       id="top"
-      className="relative flex h-screen flex-col"
+      className="relative isolate flex h-screen flex-col"
       style={{ overflowX: 'clip' }}
     >
+      {/* На lg заголовок лежит МЕЖДУ видео и канвасом-вырезкой:
+          видео z-0, текст z-1, SubjectKeyCanvas z-2 рисует только фигуру
+          (кеинг по цвету фона) — голова перекрывает буквы. */}
       <ScrubVideo
         key={darkTheme ? 'dark' : 'light'}
         src={darkTheme ? PORTRAIT_VIDEO_DARK : PORTRAIT_VIDEO_LIGHT}
+        dark={darkTheme}
       />
 
-      <div className="relative z-[5] flex flex-1 flex-col">
-        <FadeIn delay={0} y={-20}>
+      <div className="relative flex flex-1 flex-col">
+        <FadeIn delay={0} y={-20} className="relative z-10">
           <nav className="flex items-center justify-between px-6 pt-6 md:px-10 md:pt-8">
             <a href="#top" aria-label="Наверх">
               <LogoMark
@@ -138,20 +146,20 @@ export default function HeroSection({
           </nav>
         </FadeIn>
 
-        <div className="overflow-hidden">
+        <div className="relative z-[1] overflow-hidden">
           <FadeIn delay={0.15} y={40}>
             <h1
-              className={`hero-heading ${onLightBg ? 'hero-heading-on-video' : ''} mt-6 w-full whitespace-nowrap text-center text-[10.8vw] font-black uppercase leading-none tracking-tight sm:mt-4 sm:text-[11.5vw] md:-mt-5 md:text-[12.3vw] lg:text-[13.4vw]`}
+              className={`hero-heading ${onLightBg ? 'hero-heading-on-video' : ''} mt-6 w-full whitespace-nowrap text-center font-display text-[12.5vw] font-black leading-none tracking-tight sm:mt-4 md:-mt-5`}
             >
               Хай, я Джек
             </h1>
           </FadeIn>
         </div>
 
-        <div className="mt-auto flex items-end justify-between px-6 pb-7 sm:pb-8 md:px-10 md:pb-10">
+        <div className="relative z-10 mt-auto flex items-end justify-between px-6 pb-7 sm:pb-8 md:px-10 md:pb-10">
           <FadeIn delay={0.35} y={20}>
             <p
-              className={`max-w-[160px] font-light uppercase leading-snug tracking-wide text-[#D7E2EA] sm:max-w-[220px] md:max-w-[260px] ${onLightBg ? 'lg:text-[#0C0C0C]' : ''}`}
+              className={`max-w-[180px] font-normal leading-snug text-[#D7E2EA] sm:max-w-[240px] md:max-w-[280px] ${onLightBg ? 'lg:text-[#0C0C0C]' : ''}`}
               style={{ fontSize: 'clamp(0.75rem, 1.4vw, 1.5rem)' }}
             >
               3D-художник, одержимый созданием ярких и незабываемых проектов

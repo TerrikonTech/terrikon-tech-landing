@@ -41,7 +41,7 @@ export default function ServicesSection() {
     >
       <FadeIn y={40}>
         <h2
-          className="mb-16 text-center font-black uppercase leading-none tracking-tight text-[#0C0C0C] sm:mb-20 md:mb-28"
+          className="mb-16 text-center font-display font-black leading-none tracking-tight text-[#0C0C0C] sm:mb-20 md:mb-28"
           style={{ fontSize: 'clamp(3rem, 12vw, 160px)' }}
         >
           Услуги
@@ -61,20 +61,20 @@ export default function ServicesSection() {
               }}
             >
               <span
-                className="font-black leading-none text-[#0C0C0C]"
-                style={{ fontSize: 'clamp(3rem, 10vw, 140px)' }}
+                className="font-display font-black leading-none text-[#0C0C0C]"
+                style={{ fontSize: 'clamp(2.6rem, 8.5vw, 120px)' }}
               >
                 {service.number}
               </span>
               <div className="flex flex-col gap-2 pt-2 sm:gap-3 md:pt-4">
                 <h3
-                  className="font-medium uppercase text-[#0C0C0C]"
-                  style={{ fontSize: 'clamp(1rem, 2.2vw, 2.1rem)' }}
+                  className="font-display font-semibold text-[#0C0C0C]"
+                  style={{ fontSize: 'clamp(1rem, 2vw, 1.8rem)' }}
                 >
                   {service.name}
                 </h3>
                 <p
-                  className="max-w-2xl font-light leading-relaxed text-[#0C0C0C] opacity-60"
+                  className="max-w-2xl font-normal leading-relaxed text-[#0C0C0C] opacity-60"
                   style={{ fontSize: 'clamp(0.85rem, 1.6vw, 1.25rem)' }}
                 >
                   {service.description}

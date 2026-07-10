@@ -34,24 +34,24 @@ function ProjectCard({ project, index, totalCards, progress }: ProjectCardProps)
   return (
     <div className="sticky top-24 h-[85vh] md:top-32">
       <motion.div
-        className="relative rounded-[40px] border-2 border-[#D7E2EA] bg-[#0C0C0C] p-4 sm:rounded-[50px] sm:p-6 md:rounded-[60px] md:p-8"
+        className="relative rounded-[20px] border-2 border-[#D7E2EA] bg-[#0C0C0C] p-4 sm:rounded-[24px] sm:p-6 md:rounded-[28px] md:p-8"
         style={{ scale, top: `${index * 28}px` }}
       >
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-4 sm:gap-6 md:gap-8">
             <span
-              className="font-black leading-none text-[#D7E2EA]"
-              style={{ fontSize: 'clamp(3rem, 10vw, 140px)' }}
+              className="font-display font-black leading-none text-[#D7E2EA]"
+              style={{ fontSize: 'clamp(2.6rem, 8.5vw, 120px)' }}
             >
               {project.number}
             </span>
             <div className="flex flex-col">
-              <span className="text-xs font-light uppercase tracking-widest text-[#D7E2EA] opacity-60 sm:text-sm">
+              <span className="text-xs font-normal uppercase tracking-widest text-[#D7E2EA] opacity-60 sm:text-sm">
                 {project.category}
               </span>
               <h3
-                className="font-medium uppercase text-[#D7E2EA]"
-                style={{ fontSize: 'clamp(1.1rem, 2.4vw, 2.2rem)' }}
+                className="font-display font-semibold text-[#D7E2EA]"
+                style={{ fontSize: 'clamp(1.1rem, 2.2vw, 1.9rem)' }}
               >
                 {project.name}
               </h3>
@@ -64,7 +64,7 @@ function ProjectCard({ project, index, totalCards, progress }: ProjectCardProps)
             src={project.media}
             alt={`${project.name} — превью проекта`}
             loading="lazy"
-            className="w-full rounded-[40px] object-cover sm:rounded-[50px] md:rounded-[60px]"
+            className="w-full rounded-2xl object-cover"
             style={{ height: 'clamp(240px, 34vw, 440px)' }}
           />
         </div>
@@ -87,7 +87,7 @@ export default function ProjectsSection() {
     >
       <FadeIn y={40}>
         <h2
-          className="hero-heading mb-16 text-center font-black uppercase leading-none tracking-tight sm:mb-20 md:mb-28"
+          className="hero-heading mb-16 text-center font-display font-black leading-none tracking-tight sm:mb-20 md:mb-28"
           style={{ fontSize: 'clamp(3rem, 12vw, 160px)' }}
         >
           Проекты

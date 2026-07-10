@@ -35,7 +35,7 @@ export default function ThemeSwitch({
       <span
         className={`flex h-4 w-7 items-center rounded-full p-0.5 transition-colors duration-200 sm:h-5 sm:w-9 ${
           checked
-            ? 'justify-end bg-[#B600A8]'
+            ? 'justify-end bg-[#FF6A00]'
             : `justify-start bg-[#D7E2EA]/30 ${onLightBg ? 'lg:bg-[#0C0C0C]/25' : ''}`
         }`}
       >

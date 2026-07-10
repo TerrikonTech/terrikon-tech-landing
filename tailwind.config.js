@@ -4,7 +4,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        display: ['Montserrat', 'sans-serif'],
+        display: ['Unbounded', 'sans-serif'],
+        sans: ['"Golos Text"', 'sans-serif'],
       },
     },
   },
