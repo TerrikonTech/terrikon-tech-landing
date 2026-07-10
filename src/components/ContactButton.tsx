@@ -1,25 +1,48 @@
-import type { CSSProperties } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
+
+/** Единственный канал связи студии; используется кнопками CTA и футером */
+export const TELEGRAM_URL = 'https://t.me/Zotov_O'
 
 interface ContactButtonProps {
   /** true — кнопка лежит на светлом фоне видео (lg, светлая тема) */
   onLightBg?: boolean
+  /** dark — сплошная тёмная пилюля для белых секций: стекло на белом не читается */
+  variant?: 'glass' | 'dark'
+  children?: ReactNode
 }
+
+const SHARED =
+  'relative inline-flex origin-center cursor-pointer select-none items-center justify-center rounded-full px-8 py-3 outline-none transition-transform duration-[400ms] ease-[cubic-bezier(0.4,1.5,0.3,1)] hover:scale-[1.03] active:scale-[0.96] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#FF6A00] sm:px-10 sm:py-3.5 md:px-12 md:py-4'
 
 // Кнопка в духе Apple Tahoe liquid glass (easemize/apple-tahoe-liquid-glass-button,
 // 21st.dev). Портирован standalone-режим (svg-mode): стеклянный слой на
 // backdrop-filter + пакет внутренних теней + световой ободок. Динамический
 // анализ преломления из LiquidGlassViewport не переносим — он работает только
 // поверх статичной картинки, а у нас фон hero — живое видео.
-export default function ContactButton({ onLightBg = false }: ContactButtonProps) {
+export default function ContactButton({
+  onLightBg = false,
+  variant = 'glass',
+  children = 'Связаться',
+}: ContactButtonProps) {
+  if (variant === 'dark') {
+    return (
+      <a
+        href={TELEGRAM_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`${SHARED} bg-[#0C0C0C] text-xs font-semibold uppercase tracking-widest text-white/95 sm:text-sm md:text-base`}
+      >
+        {children}
+      </a>
+    )
+  }
+
   return (
-    <button
-      type="button"
-      onClick={() =>
-        document
-          .querySelector('#contact')
-          ?.scrollIntoView({ behavior: 'smooth' })
-      }
-      className="relative inline-flex origin-center cursor-pointer select-none items-center justify-center rounded-full border-0 bg-transparent px-8 py-3 outline-none transition-transform duration-[400ms] ease-[cubic-bezier(0.4,1.5,0.3,1)] hover:scale-[1.03] active:scale-[0.96] sm:px-10 sm:py-3.5 md:px-12 md:py-4"
+    <a
+      href={TELEGRAM_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`${SHARED} border-0 bg-transparent`}
       style={
         {
           '--cos': '0',
@@ -70,8 +93,8 @@ export default function ContactButton({ onLightBg = false }: ContactButtonProps)
           onLightBg ? 'text-white/90 lg:text-black/85' : 'text-white/90'
         }`}
       >
-        Связаться
+        {children}
       </span>
-    </button>
+    </a>
   )
 }

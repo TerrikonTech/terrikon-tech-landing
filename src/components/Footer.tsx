@@ -1,5 +1,6 @@
 import { Send } from 'lucide-react'
 import LogoMark from './LogoMark'
+import { TELEGRAM_URL } from './ContactButton'
 
 // Футер в духе Nur/ui: колонки ссылок, разделитель, соцлинк + копирайт
 // и гигантский контурный водяной знак «ТЕРРИКОН», обрезанный снизу
@@ -61,22 +62,23 @@ export default function Footer() {
           </div>
         ))}
 
-        {/* Контакты — только Телеграм */}
+        {/* Контакты — единственное целевое действие, поэтому кнопка, не строчка */}
         <div>
           <h3 className="text-base font-semibold text-white">Контакты</h3>
-          <ul className="mt-5">
-            <li>
-              <a
-                href="https://t.me/Zotov_O"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2.5 text-sm text-[#D7E2EA]/60 transition-colors hover:text-white"
-              >
-                <Send className="h-4 w-4 text-[#BBCCD7]" />
-                Телеграм
-              </a>
-            </li>
-          </ul>
+          <a
+            href={TELEGRAM_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-5 inline-flex items-center gap-2.5 rounded-full bg-[#FF6A00] px-6 py-3 text-sm font-semibold text-[#0C0C0C] transition-transform hover:scale-[1.04] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#FF6A00] active:scale-[0.97]"
+          >
+            <Send className="h-4 w-4" />
+            Написать в Telegram
+          </a>
+          <p className="mt-3 text-sm leading-relaxed text-[#D7E2EA]/60">
+            Олег, сооснователь.
+            <br />
+            Отвечаем в течение дня.
+          </p>
         </div>
       </div>
 

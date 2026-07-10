@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { motion, useScroll, useTransform, type MotionValue } from 'framer-motion'
 import FadeIn from './FadeIn'
+import ContactButton from './ContactButton'
 import { MARQUEE_IMAGES } from './MarqueeSection'
 
 interface Project {
@@ -105,6 +106,19 @@ export default function ProjectsSection() {
           />
         ))}
       </div>
+
+      {/* CTA сразу после кейсов — пик намерения */}
+      <FadeIn delay={0.1}>
+        <div className="flex flex-col items-center gap-6 pt-16 text-center sm:pt-20">
+          <p
+            className="max-w-xl font-normal leading-relaxed text-[#D7E2EA]/70"
+            style={{ fontSize: 'clamp(0.95rem, 1.8vw, 1.35rem)' }}
+          >
+            Хотите так же? Напишите — обсудим ваш проект и предложим план.
+          </p>
+          <ContactButton>Написать в Telegram</ContactButton>
+        </div>
+      </FadeIn>
     </section>
   )
 }
