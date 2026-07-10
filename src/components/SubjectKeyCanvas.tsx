@@ -13,11 +13,17 @@ const KEY_LIGHT = { key: [0.945, 0.941, 0.976], thresh: [0.05, 0.14] }
 const KEY_DARK = { key: [0.01, 0.01, 0.024], thresh: [0.03, 0.085] }
 
 // Кеинг по цвету дырявит фигуру там, где она совпадает с фоном (блики на
-// манекене, тёмные уши ламы) — буквы просвечивали сквозь головы. Страховка:
-// статичная маска силуэта (scratchpad/build_masks.py: flood-fill фона по
-// низкому градиенту на 9 кадрах скраба → пересечение → эрозия → растушёвка),
-// в шейдере берём max(кеинг, маска).
-const MASK_SRC = { light: '/subject-mask-light.png', dark: '/subject-mask-dark.png' }
+// манекене, тёмные уши ламы) — буквы просвечивали сквозь головы.
+// Светлая тема: статичная маска-страховка от дыр (кеинг даёт точную кромку).
+// Тёмная: лама крутит головой при скрабе, статичная маска либо режет уши,
+// либо грызёт буквы — поэтому АТЛАС покадровых масок (40 кадров, сетка 8×5,
+// тайл 240×135; build_atlas.py), шейдер берёт маску текущего кадра по
+// video.currentTime с интерполяцией между соседними.
+const MASK_SRC = {
+  light: '/subject-mask-light.png',
+  dark: '/subject-mask-dark-atlas.png',
+}
+const ATLAS = { frames: 40, cols: 8, rows: 5 }
 
 const VERT = `
 attribute vec2 aPos;
@@ -37,22 +43,34 @@ uniform vec2 uOffset;
 uniform vec3 uKey;
 uniform vec2 uThresh;
 uniform float uDark;
+uniform float uFrame;
+
+// Тайл атласа 8x5: полутексельный отступ, чтобы соседние кадры не затекали
+float atlasMask(vec2 uv, float idx) {
+  float col = mod(idx, 8.0);
+  float row = floor(idx / 8.0);
+  vec2 pad = vec2(0.5 / 240.0, 0.5 / 135.0);
+  vec2 uvc = clamp(uv, pad, vec2(1.0) - pad);
+  return texture2D(uMask, (vec2(col, row) + uvc) / vec2(8.0, 5.0)).r;
+}
+
 void main() {
   vec2 uv = vUV * uScale + uOffset;
   vec4 c = texture2D(uTex, uv);
-  float d = distance(c.rgb, uKey) / 1.7320508;
-  float m = texture2D(uMask, uv).r;
-  // Светлая тема: кеинг даёт точную кромку глянца, маска страхует от дыр.
-  float aLight = max(smoothstep(uThresh.x, uThresh.y, d), m);
-  // Тёмная: кеинг тёмного ворса по тёмному фону даёт грязную бахрому.
-  // Маска двухуровневая: >0.6 — сплошное тело; ~0.45 — зона кромки, где
-  // альфа берётся из яркости (шерстинки светлые, фон между ними чёрный —
-  // ворс ложится на буквы чётко, свечение и фон не рисуются).
-  float body = smoothstep(0.6, 0.85, m);
-  float fringe = smoothstep(0.12, 0.3, m);
-  float luma = dot(c.rgb, vec3(0.299, 0.587, 0.114));
-  float aDark = max(body, fringe * smoothstep(0.18, 0.42, luma));
-  float a = mix(aLight, aDark, uDark);
+  float a;
+  if (uDark > 0.5) {
+    // Тёмная тема: кеинг тёмного ворса по тёмному фону даёт грязь, а
+    // статичная маска не успевает за поворотом головы — берём покадровую
+    // маску из атласа по текущему времени видео, соседние кадры смешиваем
+    float f = clamp(uFrame, 0.0, 39.0);
+    float i0 = floor(f);
+    float m = mix(atlasMask(uv, i0), atlasMask(uv, min(i0 + 1.0, 39.0)), f - i0);
+    a = smoothstep(0.3, 0.7, m);
+  } else {
+    // Светлая: кеинг даёт точную кромку глянца, маска страхует от дыр
+    float d = distance(c.rgb, uKey) / 1.7320508;
+    a = max(smoothstep(uThresh.x, uThresh.y, d), texture2D(uMask, uv).r);
+  }
   gl_FragColor = vec4(c.rgb * a, a);
 }`
 
@@ -147,6 +165,7 @@ export default function SubjectKeyCanvas({
       gl.uniform2fv(gl.getUniformLocation(prog, 'uThresh'), thresh)
       const uScale = gl.getUniformLocation(prog, 'uScale')
       const uOffset = gl.getUniformLocation(prog, 'uOffset')
+      const uFrame = gl.getUniformLocation(prog, 'uFrame')
 
       // Повторяем object-fit: cover с якорем right-bottom, как у <video> на lg
       const updateCover = () => {
@@ -174,6 +193,11 @@ export default function SubjectKeyCanvas({
       const tick = () => {
         rafId = requestAnimationFrame(tick)
         if (video.readyState < 2 || !video.videoWidth) return
+        // позиция кадра в атласе масок (тёмная тема)
+        gl.uniform1f(
+          uFrame,
+          (video.currentTime / (video.duration || 1)) * (ATLAS.frames - 1),
+        )
         gl.texImage2D(
           gl.TEXTURE_2D,
           0,
