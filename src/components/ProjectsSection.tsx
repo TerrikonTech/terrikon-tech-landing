@@ -33,10 +33,13 @@ function ProjectCard({ project, index, totalCards, progress }: ProjectCardProps)
   const scale = useTransform(progress, [index / totalCards, 1], [1, targetScale])
 
   return (
-    <div className="sticky top-24 h-[85vh] md:top-32">
+    // min-h вместо жёсткой высоты: на низких/широких окнах карточка выше
+    // 85vh и вылезала из слота, накрывая CTA после секции; marginTop
+    // вместо top — чтобы смещение стопки учитывалось в высоте слота
+    <div className="sticky top-24 min-h-[85vh] md:top-32">
       <motion.div
         className="relative rounded-[20px] border-2 border-[#D7E2EA] bg-[#0C0C0C] p-4 sm:rounded-[24px] sm:p-6 md:rounded-[28px] md:p-8"
-        style={{ scale, top: `${index * 28}px` }}
+        style={{ scale, marginTop: `${index * 28}px` }}
       >
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-4 sm:gap-6 md:gap-8">
@@ -107,9 +110,10 @@ export default function ProjectsSection() {
         ))}
       </div>
 
-      {/* CTA сразу после кейсов — пик намерения */}
+      {/* CTA сразу после кейсов — пик намерения; relative z-10 — sticky-
+          карточки позиционированы и иначе красятся поверх статичного текста */}
       <FadeIn delay={0.1}>
-        <div className="flex flex-col items-center gap-6 pt-16 text-center sm:pt-20">
+        <div className="relative z-10 flex flex-col items-center gap-6 pt-24 text-center sm:pt-32">
           <p
             className="max-w-xl font-normal leading-relaxed text-[#D7E2EA]/70"
             style={{ fontSize: 'clamp(0.95rem, 1.8vw, 1.35rem)' }}
