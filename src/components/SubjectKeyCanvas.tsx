@@ -185,7 +185,9 @@ export default function SubjectKeyCanvas({
       const uOffset = gl.getUniformLocation(prog, 'uOffset')
       const uFrame = gl.getUniformLocation(prog, 'uFrame')
 
-      // Повторяем object-fit: cover с якорем right-bottom, как у <video> на lg
+      // Повторяем object-fit: cover с якорем right-top, как у <video> на lg
+      // (top, не bottom: на окнах шире 16:9 фигура опускается вниз,
+      // а не прижимается головой к навбару)
       const updateCover = () => {
         const cw = canvas.clientWidth
         const ch = canvas.clientHeight
@@ -200,7 +202,7 @@ export default function SubjectKeyCanvas({
         const dw = vw * s
         const dh = vh * s
         gl.uniform2f(uScale, cw / dw, ch / dh)
-        gl.uniform2f(uOffset, (dw - cw) / dw, (dh - ch) / dh)
+        gl.uniform2f(uOffset, (dw - cw) / dw, 0)
       }
       const ro = new ResizeObserver(updateCover)
       ro.observe(canvas)
