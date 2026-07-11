@@ -78,7 +78,9 @@ function ScrubVideo({ src, dark }: { src: string; dark: boolean }) {
 
   return (
     <>
-      <div className="pointer-events-none relative order-last w-full overflow-hidden aspect-square md:aspect-video lg:absolute lg:inset-0 lg:z-0 lg:order-none lg:aspect-auto lg:h-full">
+      {/* Видео — фон всего hero на всех ширинах (раньше на мобиле было
+          отдельным блоком под текстом — композиция разваливалась) */}
+      <div className="pointer-events-none absolute inset-0 z-0 h-full w-full overflow-hidden">
         <video
           ref={videoRef}
           muted
@@ -161,14 +163,14 @@ export default function HeroSection({
           <nav className="flex items-center justify-between px-6 pt-6 md:px-10 md:pt-8">
             <a href="#top" aria-label="Наверх">
               <LogoMark
-                className={`h-6 w-7 transition-opacity duration-200 hover:opacity-70 md:h-8 md:w-9 ${onLightBg ? 'bg-[#BBCCD7] lg:bg-black' : 'bg-[#BBCCD7]'}`}
+                className={`h-6 w-7 transition-opacity duration-200 hover:opacity-70 md:h-8 md:w-9 ${onLightBg ? 'bg-black' : 'bg-[#BBCCD7]'}`}
               />
             </a>
             {NAV_LINKS.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
-                className={`relative whitespace-nowrap text-[11px] font-medium uppercase tracking-wider text-[#D7E2EA] after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:w-full after:origin-left after:scale-x-0 after:bg-[#FF6A00] after:transition-transform after:duration-300 hover:after:scale-x-100 sm:text-sm md:text-lg lg:text-[1.4rem] ${onLightBg ? 'lg:text-[#0C0C0C]' : ''}`}
+                className={`relative whitespace-nowrap text-[11px] font-medium uppercase tracking-wider after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:w-full after:origin-left after:scale-x-0 after:bg-[#FF6A00] after:transition-transform after:duration-300 hover:after:scale-x-100 sm:text-sm md:text-lg lg:text-[1.4rem] ${onLightBg ? 'text-[#0C0C0C]' : 'text-[#D7E2EA]'}`}
               >
                 {link.label}
               </a>
@@ -212,7 +214,7 @@ export default function HeroSection({
         <div className="relative z-10 mt-auto flex items-end justify-between px-6 pb-7 sm:pb-8 md:px-10 md:pb-10">
           <FadeIn delay={0.35} y={20}>
             <p
-              className={`max-w-[180px] font-normal leading-snug text-[#D7E2EA] sm:max-w-[240px] md:max-w-[280px] ${onLightBg ? 'lg:text-[#0C0C0C]' : ''}`}
+              className={`max-w-[180px] font-normal leading-snug sm:max-w-[240px] md:max-w-[280px] ${onLightBg ? 'text-[#0C0C0C]' : 'text-[#D7E2EA]'}`}
               style={{ fontSize: 'clamp(0.75rem, 1.4vw, 1.5rem)' }}
             >
               Простые парни, одержимые созданием ярких и незабываемых

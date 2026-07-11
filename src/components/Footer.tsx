@@ -92,6 +92,19 @@ export default function Footer() {
           Размер от вьюпорта: «Террикон» в Unbounded-900 = 6.19em шириной
           (замер Range API) → 15.8vw = ~98% ширины, влезает на любом
           вьюпорте */}
+      {/* Мобильный подвал: слово на 375px — нечитаемая лента, вместо
+          него крупный лого-знак с тем же «ростом» */}
+      <motion.div
+        aria-hidden="true"
+        initial={{ y: 48, opacity: 0 }}
+        whileInView={{ y: 0, opacity: 1 }}
+        viewport={{ once: true, amount: 0.4 }}
+        transition={{ type: 'spring', stiffness: 60, damping: 15 }}
+        className="flex justify-center pb-10 pt-4 sm:hidden"
+      >
+        <LogoMark className="h-40 w-44 bg-[#BBCCD7]/20" />
+      </motion.div>
+
       {/* Слово вырастает из-под нижней кромки, как растёт отвал
           (у футера overflow-hidden — выезд из-под края бесшовный) */}
       <motion.div
@@ -100,7 +113,7 @@ export default function Footer() {
         whileInView={{ y: 0 }}
         viewport={{ once: true, amount: 0.2 }}
         transition={{ type: 'spring', stiffness: 50, damping: 16, mass: 1.1 }}
-        className="pointer-events-none relative z-0 -mx-6 select-none whitespace-nowrap text-center font-display font-black leading-none tracking-tight sm:-mx-10 md:-mx-16"
+        className="pointer-events-none relative z-0 -mx-6 hidden select-none whitespace-nowrap text-center font-display font-black leading-none tracking-tight sm:-mx-10 sm:block md:-mx-16"
         style={{
           fontSize: 'min(15.8vw, 280px)',
           // очертания Unbounded занимают 1.24em при строке 1em (замерено
