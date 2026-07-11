@@ -90,12 +90,19 @@ export default function Footer() {
         </p>
       </div>
 
-      {/* Контурный водяной знак, наполовину срезанный нижним краем */}
+      {/* Контурный водяной знак — целиком, без обрезки.
+          Размер от вьюпорта: «Террикон» в Unbounded-900 = 6.19em шириной
+          (замер Range API) → 15.8vw = ~98% ширины, влезает на любом
+          вьюпорте */}
       <div
         aria-hidden="true"
-        className="pointer-events-none relative z-0 -mb-[0.12em] select-none whitespace-nowrap text-center font-display font-black leading-none tracking-tight"
+        className="pointer-events-none relative z-0 -mx-6 select-none whitespace-nowrap text-center font-display font-black leading-none tracking-tight sm:-mx-10 md:-mx-16"
         style={{
-          fontSize: 'clamp(58px, 14.5vw, 280px)',
+          fontSize: 'min(15.8vw, 280px)',
+          // очертания Unbounded занимают 1.24em при строке 1em (замерено
+          // Range API): дескендеры выходят на 0.11em ниже строки, а у футера
+          // overflow-hidden — без запаса снизу их срезает краем страницы
+          paddingBottom: '0.18em',
           color: 'transparent',
           WebkitTextStroke: '1.5px rgba(187, 204, 215, 0.4)',
         }}

@@ -12,6 +12,19 @@ import { useEffect, useRef, type RefObject } from 'react'
 const KEY_LIGHT = { key: [0.945, 0.941, 0.976], thresh: [0.05, 0.14] }
 const KEY_DARK = { key: [0.01, 0.01, 0.024], thresh: [0.03, 0.085] }
 
+// Кеинг по цвету дырявит фигуру там, где она совпадает с фоном (блики на
+// манекене, тёмные уши ламы) — буквы просвечивали сквозь головы.
+// Светлая тема: статичная маска-страховка от дыр (кеинг даёт точную кромку).
+// Тёмная: лама крутит головой при скрабе, статичная маска либо режет уши,
+// либо грызёт буквы — поэтому АТЛАС покадровых масок (40 кадров, сетка 8×5,
+// тайл 240×135; build_atlas.py), шейдер берёт маску текущего кадра по
+// video.currentTime с интерполяцией между соседними.
+const MASK_SRC = {
+  light: '/subject-mask-light.png',
+  dark: '/subject-mask-dark-atlas.png',
+}
+const ATLAS = { frames: 40, cols: 8, rows: 5 }
+
 const VERT = `
 attribute vec2 aPos;
 varying vec2 vUV;
@@ -24,16 +37,49 @@ const FRAG = `
 precision mediump float;
 varying vec2 vUV;
 uniform sampler2D uTex;
+uniform sampler2D uMask;
 uniform vec2 uScale;
 uniform vec2 uOffset;
 uniform vec3 uKey;
 uniform vec2 uThresh;
+uniform float uDark;
+uniform float uFrame;
+
+// Тайл атласа 8x5 (R = альфа, G = яркость локального фона);
+// полутексельный отступ, чтобы соседние кадры не затекали
+vec2 atlasMask(vec2 uv, float idx) {
+  float col = mod(idx, 8.0);
+  float row = floor(idx / 8.0);
+  vec2 pad = vec2(0.5 / 240.0, 0.5 / 135.0);
+  vec2 uvc = clamp(uv, pad, vec2(1.0) - pad);
+  return texture2D(uMask, (vec2(col, row) + uvc) / vec2(8.0, 5.0)).rg;
+}
+
 void main() {
   vec2 uv = vUV * uScale + uOffset;
   vec4 c = texture2D(uTex, uv);
-  float d = distance(c.rgb, uKey) / 1.7320508;
-  float a = smoothstep(uThresh.x, uThresh.y, d);
-  gl_FragColor = vec4(c.rgb * a, a);
+  vec3 rgb;
+  float a;
+  if (uDark > 0.5) {
+    // Тёмная тема: в атласе — ГОТОВАЯ покадровая альфа (R) и яркость
+    // локального фона (G), difference matting оффлайн (build_alpha_atlas.py).
+    // Пиксель кромки = a*ворс + (1-a)*фон: примесь фона вычитаем с его
+    // розовым тинтом, иначе на полуальфе остаётся тёмный поясок.
+    float f = clamp(uFrame, 0.0, 39.0);
+    float i0 = floor(f);
+    vec2 t = mix(atlasMask(uv, i0), atlasMask(uv, min(i0 + 1.0, 39.0)), f - i0);
+    a = t.r;
+    rgb = max(c.rgb - (1.0 - a) * t.g * vec3(1.96, 0.44, 1.36), 0.0);
+    // буфер премультиплаенный: вне фигуры rgb обязан быть нулём, иначе
+    // фон и свечение аддитивно легли бы на буквы
+    rgb *= step(0.004, a);
+  } else {
+    // Светлая: кеинг даёт точную кромку глянца, маска страхует от дыр
+    float d = distance(c.rgb, uKey) / 1.7320508;
+    a = max(smoothstep(uThresh.x, uThresh.y, d), texture2D(uMask, uv).r);
+    rgb = c.rgb * a;
+  }
+  gl_FragColor = vec4(rgb, a);
 }`
 
 interface SubjectKeyCanvasProps {
@@ -91,19 +137,45 @@ export default function SubjectKeyCanvas({
       gl.enableVertexAttribArray(aPos)
       gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0)
 
-      const tex = gl.createTexture()
-      gl.bindTexture(gl.TEXTURE_2D, tex)
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+      const setupTex = (unit: number) => {
+        const t = gl.createTexture()
+        gl.activeTexture(gl.TEXTURE0 + unit)
+        gl.bindTexture(gl.TEXTURE_2D, t)
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+        return t
+      }
+      // юнит 1 — маска/атлас; до загрузки — 1×1 чёрный (вклад нулевой).
+      // Формат RGB: у атласа тёмной темы два канала (альфа + фон),
+      // grayscale-маска светлой раскладывается в r=g=b
+      const maskTex = setupTex(1)
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, 1, 1, 0, gl.RGB,
+        gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0]))
+      const maskImg = new Image()
+      maskImg.onload = () => {
+        if (!cleanupGL) return
+        gl.activeTexture(gl.TEXTURE1)
+        gl.bindTexture(gl.TEXTURE_2D, maskTex)
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB,
+          gl.UNSIGNED_BYTE, maskImg)
+        // вернуть активный юнит: tick заливает кадры видео в юнит 0
+        gl.activeTexture(gl.TEXTURE0)
+      }
+      maskImg.src = MASK_SRC[dark ? 'dark' : 'light']
+      // юнит 0 — кадр видео (активным остаётся он: tick заливает сюда)
+      const tex = setupTex(0)
 
       const { key, thresh } = dark ? KEY_DARK : KEY_LIGHT
       gl.uniform1i(gl.getUniformLocation(prog, 'uTex'), 0)
+      gl.uniform1i(gl.getUniformLocation(prog, 'uMask'), 1)
+      gl.uniform1f(gl.getUniformLocation(prog, 'uDark'), dark ? 1 : 0)
       gl.uniform3fv(gl.getUniformLocation(prog, 'uKey'), key)
       gl.uniform2fv(gl.getUniformLocation(prog, 'uThresh'), thresh)
       const uScale = gl.getUniformLocation(prog, 'uScale')
       const uOffset = gl.getUniformLocation(prog, 'uOffset')
+      const uFrame = gl.getUniformLocation(prog, 'uFrame')
 
       // Повторяем object-fit: cover с якорем right-bottom, как у <video> на lg
       const updateCover = () => {
@@ -131,6 +203,11 @@ export default function SubjectKeyCanvas({
       const tick = () => {
         rafId = requestAnimationFrame(tick)
         if (video.readyState < 2 || !video.videoWidth) return
+        // позиция кадра в атласе масок (тёмная тема)
+        gl.uniform1f(
+          uFrame,
+          (video.currentTime / (video.duration || 1)) * (ATLAS.frames - 1),
+        )
         gl.texImage2D(
           gl.TEXTURE_2D,
           0,
@@ -147,8 +224,10 @@ export default function SubjectKeyCanvas({
         cancelAnimationFrame(rafId)
         ro.disconnect()
         video.removeEventListener('loadedmetadata', updateCover)
+        maskImg.onload = null
         gl.deleteProgram(prog)
         gl.deleteTexture(tex)
+        gl.deleteTexture(maskTex)
         gl.deleteBuffer(buf)
       }
     }
