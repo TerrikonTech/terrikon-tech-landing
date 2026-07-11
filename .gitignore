@@ -32,3 +32,6 @@ dist/
 *.db
 extra_admins.json
 .vercel
+
+# рабочие файлы аудита
+AUDIT.md
