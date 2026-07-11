@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { MotionConfig } from 'framer-motion'
 import Preloader from './components/Preloader'
 import HeroSection from './components/HeroSection'
 import MarqueeSection from './components/MarqueeSection'
@@ -10,8 +11,9 @@ import TerrikonRidge from './components/TerrikonRidge'
 import Footer from './components/Footer'
 
 export default function App() {
+  // Тёмная — дефолт: светлая только если выбрана явно
   const [darkTheme, setDarkTheme] = useState(
-    () => localStorage.getItem('jack-theme') === 'dark',
+    () => localStorage.getItem('jack-theme') !== 'light',
   )
 
   useEffect(() => {
@@ -19,19 +21,23 @@ export default function App() {
   }, [darkTheme])
 
   return (
-    <main
-      className="min-h-screen bg-[#0C0C0C] font-sans"
-      style={{ overflowX: 'clip' }}
-    >
-      <Preloader />
-      <HeroSection darkTheme={darkTheme} onToggleTheme={setDarkTheme} />
-      <MarqueeSection />
-      <AboutSection />
-      <ServicesSection />
-      <ProjectsSection />
-      <TeamSection />
-      <TerrikonRidge />
-      <Footer />
-    </main>
+    // reducedMotion="user": все framer-motion анимации гасятся системной
+    // настройкой «уменьшить движение» (WCAG 2.3.3)
+    <MotionConfig reducedMotion="user">
+      <main
+        className="min-h-screen bg-[#0C0C0C] font-sans"
+        style={{ overflowX: 'clip' }}
+      >
+        <Preloader />
+        <HeroSection darkTheme={darkTheme} onToggleTheme={setDarkTheme} />
+        <MarqueeSection />
+        <AboutSection />
+        <ServicesSection />
+        <ProjectsSection />
+        <TeamSection />
+        <TerrikonRidge />
+        <Footer />
+      </main>
+    </MotionConfig>
   )
 }

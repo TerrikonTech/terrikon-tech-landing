@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion'
 import { Send } from 'lucide-react'
 import LogoMark from './LogoMark'
 import { TELEGRAM_URL } from './ContactButton'
@@ -5,19 +6,16 @@ import { TELEGRAM_URL } from './ContactButton'
 // Футер в духе Nur/ui: колонки ссылок, разделитель, соцлинк + копирайт
 // и гигантский контурный водяной знак «ТЕРРИКОН», обрезанный снизу
 
+// Одна колонка «Меню»: «Полезные ссылки» с «Наверх» внутри — рыбный
+// заголовок, навигация по сайту и есть меню
 const NAV_COLUMNS = [
   {
-    title: 'О нас',
+    title: 'Меню',
     links: [
       { label: 'О студии', href: '#about' },
-      { label: 'Команда', href: '#team' },
-      { label: 'Проекты', href: '#projects' },
-    ],
-  },
-  {
-    title: 'Полезные ссылки',
-    links: [
       { label: 'Услуги', href: '#price' },
+      { label: 'Проекты', href: '#projects' },
+      { label: 'Команда', href: '#team' },
       { label: 'Наверх', href: '#top' },
     ],
   },
@@ -31,14 +29,14 @@ export default function Footer() {
     >
       <div className="relative z-10 mx-auto grid max-w-6xl grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
         {/* Лого + описание */}
-        <div>
+        <div className="lg:col-span-2">
           <div className="flex items-center gap-2.5">
             <LogoMark className="h-7 w-8 bg-[#BBCCD7]" />
             <span className="font-display text-2xl font-bold tracking-tight text-white">
               Террикон
             </span>
           </div>
-          <p className="mt-4 max-w-[260px] text-sm leading-relaxed text-[#D7E2EA]/50">
+          <p className="mt-4 max-w-[260px] text-sm leading-relaxed text-[#D7E2EA]/65">
             Террикон — студия из Донецка: сайты, приложения и 3D, которые
             запоминаются.
           </p>
@@ -85,17 +83,23 @@ export default function Footer() {
       <div className="relative z-10 mx-auto mt-16 max-w-6xl border-t border-white/10" />
 
       <div className="relative z-10 mx-auto flex max-w-6xl items-center justify-end py-8">
-        <p className="text-xs text-[#D7E2EA]/40 sm:text-sm">
+        <p className="text-xs text-[#D7E2EA]/60 sm:text-sm">
           © 2026 Террикон. Все права защищены.
         </p>
       </div>
 
-      {/* Контурный водяной знак — целиком, без обрезки.
-          Размер от вьюпорта: «Террикон» в Unbounded-900 = 6.19em шириной
-          (замер Range API) → 15.8vw = ~98% ширины, влезает на любом
-          вьюпорте */}
-      <div
+      {/* Водяной знак — призрачная заливка с растворением вниз (слово-
+          монумент тает в фон; контурная обводка забракована). Размер от
+          вьюпорта: «Террикон» в Unbounded-900 = 6.19em шириной (замер
+          Range API) → 15.8vw = ~98% ширины на любой ширине. Вырастает
+          из-под нижней кромки, как растёт отвал (overflow-hidden футера
+          делает выезд бесшовным) */}
+      <motion.div
         aria-hidden="true"
+        initial={{ y: '55%' }}
+        whileInView={{ y: 0 }}
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{ type: 'spring', stiffness: 50, damping: 16, mass: 1.1 }}
         className="pointer-events-none relative z-0 -mx-6 select-none whitespace-nowrap text-center font-display font-black leading-none tracking-tight sm:-mx-10 md:-mx-16"
         style={{
           fontSize: 'min(15.8vw, 280px)',
@@ -103,12 +107,15 @@ export default function Footer() {
           // Range API): дескендеры выходят на 0.11em ниже строки, а у футера
           // overflow-hidden — без запаса снизу их срезает краем страницы
           paddingBottom: '0.18em',
+          backgroundImage:
+            'linear-gradient(180deg, rgba(187,204,215,0.20) 0%, rgba(187,204,215,0.03) 85%)',
+          WebkitBackgroundClip: 'text',
+          backgroundClip: 'text',
           color: 'transparent',
-          WebkitTextStroke: '1.5px rgba(187, 204, 215, 0.4)',
         }}
       >
         Террикон
-      </div>
+      </motion.div>
     </footer>
   )
 }

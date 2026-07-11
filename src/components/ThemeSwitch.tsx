@@ -16,8 +16,8 @@ export default function ThemeSwitch({
   onLightBg,
 }: ThemeSwitchProps) {
   const iconBase =
-    'h-3.5 w-3.5 transition-opacity duration-200 sm:h-4 sm:w-4 md:h-5 md:w-5 text-[#D7E2EA]'
-  const darkOnLg = onLightBg ? 'lg:text-[#0C0C0C]' : ''
+    'h-3.5 w-3.5 transition-opacity duration-200 sm:h-4 sm:w-4 md:h-5 md:w-5'
+  const darkOnLg = onLightBg ? 'text-[#0C0C0C]' : 'text-[#D7E2EA]'
 
   return (
     <button
@@ -26,7 +26,7 @@ export default function ThemeSwitch({
       aria-checked={checked}
       aria-label="Переключить тёмную тему"
       onClick={() => onChange(!checked)}
-      className="flex shrink-0 items-center gap-1.5 sm:gap-2"
+      className="-m-2.5 flex shrink-0 items-center gap-1.5 p-2.5 sm:gap-2"
     >
       <Sun
         strokeWidth={2}
@@ -36,7 +36,7 @@ export default function ThemeSwitch({
         className={`flex h-4 w-7 items-center rounded-full p-0.5 transition-colors duration-200 sm:h-5 sm:w-9 ${
           checked
             ? 'justify-end bg-[#FF6A00]'
-            : `justify-start bg-[#D7E2EA]/30 ${onLightBg ? 'lg:bg-[#0C0C0C]/25' : ''}`
+            : `justify-start ${onLightBg ? 'bg-[#0C0C0C]/25' : 'bg-[#D7E2EA]/30'}`
         }`}
       >
         <motion.span

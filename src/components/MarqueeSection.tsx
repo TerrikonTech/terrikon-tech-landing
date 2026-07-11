@@ -58,6 +58,8 @@ export default function MarqueeSection() {
   const [offset, setOffset] = useState(0)
 
   useEffect(() => {
+    // параллакс — чистая декорация: при «уменьшить движение» ленты статичны
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     const handleScroll = () => {
       if (!sectionRef.current) return
       const sectionTop = sectionRef.current.offsetTop
@@ -71,7 +73,8 @@ export default function MarqueeSection() {
   return (
     <section
       ref={sectionRef}
-      className="flex flex-col gap-3 bg-[#0C0C0C] pb-10 pt-24 sm:pt-32 md:pt-40"
+      // растворение у краёв вьюпорта: ленты не обрываются жёстким срезом
+      className="flex flex-col gap-3 bg-[#0C0C0C] pb-10 pt-24 [-webkit-mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)] [mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)] sm:pt-32 md:pt-40"
     >
       <MarqueeRow images={ROW_1} transform={`translateX(${offset - 200}px)`} />
       <MarqueeRow

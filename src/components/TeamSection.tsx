@@ -1,8 +1,47 @@
+import { useRef, type ReactNode } from 'react'
+import { motion, useMotionValue, useSpring } from 'framer-motion'
 import FadeIn from './FadeIn'
 
 // Секция команды по мотивам ravikatiyar162/team-section-1 (21st.dev),
 // адаптация под наш стек и тёмную палитру (без shadcn-токенов).
 // Контакты в карточках не показываем — единственный контакт в подвале.
+
+/** 3D-наклон карточки за курсором (только pointer:fine, гасится
+    prefers-reduced-motion — слушатель просто не вешается) */
+function TiltCard({ className, children }: { className?: string; children: ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const rx = useMotionValue(0)
+  const ry = useMotionValue(0)
+  const srx = useSpring(rx, { stiffness: 180, damping: 18 })
+  const sry = useSpring(ry, { stiffness: 180, damping: 18 })
+
+  const interactive = () =>
+    window.matchMedia('(pointer: fine)').matches &&
+    !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  const onMove = (e: React.MouseEvent) => {
+    if (!ref.current || !interactive()) return
+    const r = ref.current.getBoundingClientRect()
+    ry.set(((e.clientX - r.left) / r.width - 0.5) * 10)
+    rx.set(-((e.clientY - r.top) / r.height - 0.5) * 8)
+  }
+  const onLeave = () => {
+    rx.set(0)
+    ry.set(0)
+  }
+
+  return (
+    <motion.div
+      ref={ref}
+      onMouseMove={onMove}
+      onMouseLeave={onLeave}
+      style={{ rotateX: srx, rotateY: sry, transformPerspective: 800 }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  )
+}
 
 interface TeamMember {
   name: string
@@ -65,15 +104,15 @@ export default function TeamSection() {
             Команда
           </h2>
           <p className="mx-auto mt-6 max-w-xl font-normal leading-relaxed text-[#D7E2EA]/60 sm:text-lg">
-            Мы сами пишем свои проекты — двое разработчиков из Донецка, чтобы
-            каждая идея доезжала до продакшена.
+            Нас двое, и код мы пишем сами — между вашей идеей и продакшеном
+            нет посредников.
           </p>
         </FadeIn>
 
         <div className="grid w-full max-w-3xl grid-cols-1 items-stretch gap-8 md:grid-cols-2 lg:gap-12">
           {MEMBERS.map((member, index) => (
             <FadeIn key={member.name} delay={index * 0.15} y={30} className="h-full">
-              <div className="group relative flex h-full flex-col items-center justify-end overflow-hidden rounded-xl bg-[#141414] p-8 text-center shadow-lg transition-all duration-300 ease-in-out hover:scale-[1.02] hover:shadow-2xl">
+              <TiltCard className="group relative flex h-full flex-col items-center justify-end overflow-hidden rounded-xl bg-[#141414] p-8 text-center shadow-lg transition-shadow duration-300 ease-in-out hover:shadow-2xl">
                 {/* Волна на ховере */}
                 <div
                   className="absolute bottom-0 left-0 right-0 h-1/2 origin-bottom scale-y-0 transform rounded-t-full bg-gradient-to-t from-[#BBCCD7]/20 to-transparent transition-transform duration-500 ease-out group-hover:scale-y-100"
@@ -96,10 +135,10 @@ export default function TeamSection() {
                 <h3 className="relative z-10 mt-5 text-xl font-semibold text-[#D7E2EA]">
                   {member.name}
                 </h3>
-                <p className="relative z-10 mt-1 text-sm text-[#D7E2EA]/50">
+                <p className="relative z-10 mt-1 text-sm text-[#D7E2EA]/65">
                   {member.designation}
                 </p>
-              </div>
+              </TiltCard>
             </FadeIn>
           ))}
         </div>

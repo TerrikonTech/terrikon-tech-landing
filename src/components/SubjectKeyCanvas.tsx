@@ -112,7 +112,6 @@ export default function SubjectKeyCanvas({
     const video = videoRef.current
     if (!canvas || !video) return
 
-    const mq = window.matchMedia('(min-width: 1024px)')
     let cleanupGL: (() => void) | null = null
 
     const start = () => {
@@ -204,16 +203,25 @@ export default function SubjectKeyCanvas({
         canvas.width = Math.round(cw * dpr)
         canvas.height = Math.round(ch * dpr)
         gl.viewport(0, 0, canvas.width, canvas.height)
-        const contain = dark && cw / ch >= 16 / 9
+        const lg = window.matchMedia('(min-width: 1024px)').matches
+        const contain = dark && lg && cw / ch >= 16 / 9
         const s = contain
           ? Math.min(cw / vw, ch / vh)
           : Math.max(cw / vw, ch / vh)
         const dw = vw * s
         const dh = vh * s
+        // якоря кропа = object-position видео: lg — right-top,
+        // мобила — лама center, манекен 68%/50% (иначе вырезка разъедется)
+        const ax = lg ? 1 : dark ? 0.5 : 0.68
+        const ay = lg ? 0 : 0.5
         gl.uniform2f(uScale, cw / dw, ch / dh)
         // contain: видео по центру (offset отрицательный — поля по бокам,
-        // шейдер гасит uv вне [0,1]); cover: якорь right
-        gl.uniform2f(uOffset, contain ? -(cw - dw) / 2 / dw : (dw - cw) / dw, 0)
+        // шейдер гасит uv вне [0,1]); cover: доля запаса по якорю
+        gl.uniform2f(
+          uOffset,
+          contain ? -(cw - dw) / 2 / dw : ((dw - cw) * ax) / dw,
+          ((dh - ch) * ay) / dh,
+        )
       }
       const ro = new ResizeObserver(updateCover)
       ro.observe(canvas)
@@ -253,23 +261,19 @@ export default function SubjectKeyCanvas({
       }
     }
 
-    const stop = () => {
+    // Работает на всех ширинах: на мобиле видео — фон hero, и фигура
+    // должна перекрывать заголовок так же, как на десктопе
+    start()
+    return () => {
       cleanupGL?.()
       cleanupGL = null
-    }
-    const onChange = () => (mq.matches ? start() : stop())
-    onChange()
-    mq.addEventListener('change', onChange)
-    return () => {
-      mq.removeEventListener('change', onChange)
-      stop()
     }
   }, [videoRef, dark])
 
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none absolute inset-0 z-[2] hidden lg:block"
+      className="pointer-events-none absolute inset-0 z-[2]"
     >
       <canvas ref={canvasRef} className="h-full w-full" />
     </div>
