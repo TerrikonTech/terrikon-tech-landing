@@ -90,17 +90,18 @@ export default function Footer() {
         </p>
       </div>
 
-      {/* Контурный водяной знак: слово стоит на нижнем крае страницы.
+      {/* Контурный водяной знак — целиком, без обрезки.
           Размер от вьюпорта: «Террикон» в Unbounded-900 = 6.19em шириной
-          (замер Range API) → 15.8vw = ~98% ширины, целиком в экране на
-          любом вьюпорте. Высота бокса 0.8em ≈ до базовой линии: капсы
-          видны полностью, срезаются только хвосты «р» */}
+          (замер Range API) → 15.8vw = ~98% ширины, влезает на любом
+          вьюпорте */}
       <div
         aria-hidden="true"
-        className="pointer-events-none relative z-0 -mx-6 select-none overflow-hidden whitespace-nowrap text-center font-display font-black leading-none tracking-tight sm:-mx-10 md:-mx-16"
+        className="pointer-events-none relative z-0 -mx-6 select-none whitespace-nowrap text-center font-display font-black leading-none tracking-tight sm:-mx-10 md:-mx-16"
         style={{
           fontSize: 'min(15.8vw, 280px)',
-          height: '0.8em',
+          // дескендеры «р» выходят за строку (line-height 1), а у футера
+          // overflow-hidden — без запаса снизу их срезает краем страницы
+          paddingBottom: '0.1em',
           color: 'transparent',
           WebkitTextStroke: '1.5px rgba(187, 204, 215, 0.4)',
         }}
