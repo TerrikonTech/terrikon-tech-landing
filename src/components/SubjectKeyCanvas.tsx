@@ -45,33 +45,41 @@ uniform vec2 uThresh;
 uniform float uDark;
 uniform float uFrame;
 
-// Тайл атласа 8x5: полутексельный отступ, чтобы соседние кадры не затекали
-float atlasMask(vec2 uv, float idx) {
+// Тайл атласа 8x5 (R = альфа, G = яркость локального фона);
+// полутексельный отступ, чтобы соседние кадры не затекали
+vec2 atlasMask(vec2 uv, float idx) {
   float col = mod(idx, 8.0);
   float row = floor(idx / 8.0);
   vec2 pad = vec2(0.5 / 240.0, 0.5 / 135.0);
   vec2 uvc = clamp(uv, pad, vec2(1.0) - pad);
-  return texture2D(uMask, (vec2(col, row) + uvc) / vec2(8.0, 5.0)).r;
+  return texture2D(uMask, (vec2(col, row) + uvc) / vec2(8.0, 5.0)).rg;
 }
 
 void main() {
   vec2 uv = vUV * uScale + uOffset;
   vec4 c = texture2D(uTex, uv);
+  vec3 rgb;
   float a;
   if (uDark > 0.5) {
-    // Тёмная тема: в атласе — ГОТОВАЯ покадровая альфа (difference matting
-    // оффлайн: из пикселя вычтен локальный фон вместе со свечением, ворс =
-    // покрытие по остатку света; build_alpha_atlas.py). Шейдер только
-    // выбирает кадр по video.currentTime и смешивает соседние.
+    // Тёмная тема: в атласе — ГОТОВАЯ покадровая альфа (R) и яркость
+    // локального фона (G), difference matting оффлайн (build_alpha_atlas.py).
+    // Пиксель кромки = a*ворс + (1-a)*фон: примесь фона вычитаем с его
+    // розовым тинтом, иначе на полуальфе остаётся тёмный поясок.
     float f = clamp(uFrame, 0.0, 39.0);
     float i0 = floor(f);
-    a = mix(atlasMask(uv, i0), atlasMask(uv, min(i0 + 1.0, 39.0)), f - i0);
+    vec2 t = mix(atlasMask(uv, i0), atlasMask(uv, min(i0 + 1.0, 39.0)), f - i0);
+    a = t.r;
+    rgb = max(c.rgb - (1.0 - a) * t.g * vec3(1.96, 0.44, 1.36), 0.0);
+    // буфер премультиплаенный: вне фигуры rgb обязан быть нулём, иначе
+    // фон и свечение аддитивно легли бы на буквы
+    rgb *= step(0.004, a);
   } else {
     // Светлая: кеинг даёт точную кромку глянца, маска страхует от дыр
     float d = distance(c.rgb, uKey) / 1.7320508;
     a = max(smoothstep(uThresh.x, uThresh.y, d), texture2D(uMask, uv).r);
+    rgb = c.rgb * a;
   }
-  gl_FragColor = vec4(c.rgb * a, a);
+  gl_FragColor = vec4(rgb, a);
 }`
 
 interface SubjectKeyCanvasProps {
@@ -139,16 +147,18 @@ export default function SubjectKeyCanvas({
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
         return t
       }
-      // юнит 1 — маска силуэта; до загрузки — 1×1 чёрный (вклад нулевой)
+      // юнит 1 — маска/атлас; до загрузки — 1×1 чёрный (вклад нулевой).
+      // Формат RGB: у атласа тёмной темы два канала (альфа + фон),
+      // grayscale-маска светлой раскладывается в r=g=b
       const maskTex = setupTex(1)
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.LUMINANCE, 1, 1, 0, gl.LUMINANCE,
-        gl.UNSIGNED_BYTE, new Uint8Array([0]))
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, 1, 1, 0, gl.RGB,
+        gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0]))
       const maskImg = new Image()
       maskImg.onload = () => {
         if (!cleanupGL) return
         gl.activeTexture(gl.TEXTURE1)
         gl.bindTexture(gl.TEXTURE_2D, maskTex)
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.LUMINANCE, gl.LUMINANCE,
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB,
           gl.UNSIGNED_BYTE, maskImg)
         // вернуть активный юнит: tick заливает кадры видео в юнит 0
         gl.activeTexture(gl.TEXTURE0)
