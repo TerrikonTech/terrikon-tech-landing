@@ -1,4 +1,5 @@
 import FadeIn from './FadeIn'
+import ContactButton from './ContactButton'
 
 const SERVICES = [
   {
@@ -83,6 +84,20 @@ export default function ServicesSection() {
             </div>
           </FadeIn>
         ))}
+
+        {/* CTA в горячей точке: пользователь только что прочитал услуги */}
+        <FadeIn delay={0.1}>
+          <div className="flex flex-col items-center gap-6 pt-16 text-center sm:pt-20">
+            <p
+              className="max-w-xl font-normal leading-relaxed text-[#0C0C0C] opacity-70"
+              style={{ fontSize: 'clamp(0.95rem, 1.8vw, 1.35rem)' }}
+            >
+              Не нашли свою задачу? Расскажите, что нужно, — соберём решение
+              под вас.
+            </p>
+            <ContactButton variant="dark">Обсудить задачу</ContactButton>
+          </div>
+        </FadeIn>
       </div>
     </section>
   )
