@@ -99,9 +99,10 @@ export default function Footer() {
         className="pointer-events-none relative z-0 -mx-6 select-none whitespace-nowrap text-center font-display font-black leading-none tracking-tight sm:-mx-10 md:-mx-16"
         style={{
           fontSize: 'min(15.8vw, 280px)',
-          // дескендеры «р» выходят за строку (line-height 1), а у футера
+          // очертания Unbounded занимают 1.24em при строке 1em (замерено
+          // Range API): дескендеры выходят на 0.11em ниже строки, а у футера
           // overflow-hidden — без запаса снизу их срезает краем страницы
-          paddingBottom: '0.1em',
+          paddingBottom: '0.18em',
           color: 'transparent',
           WebkitTextStroke: '1.5px rgba(187, 204, 215, 0.4)',
         }}
