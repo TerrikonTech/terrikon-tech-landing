@@ -82,7 +82,13 @@ export default function Footer() {
 
       <div className="relative z-10 mx-auto mt-16 max-w-6xl border-t border-white/10" />
 
-      <div className="relative z-10 mx-auto flex max-w-6xl items-center justify-end py-8">
+      <div className="relative z-10 mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 py-8">
+        <a
+          href="/privacy.html"
+          className="text-xs text-[#D7E2EA]/60 transition-colors hover:text-white sm:text-sm"
+        >
+          Политика обработки персональных данных
+        </a>
         <p className="text-xs text-[#D7E2EA]/60 sm:text-sm">
           © 2026 Террикон. Все права защищены.
         </p>
