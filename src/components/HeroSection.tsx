@@ -1,4 +1,5 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import FadeIn from './FadeIn'
 import ContactButton from './ContactButton'
 import SubjectKeyCanvas from './SubjectKeyCanvas'
@@ -121,6 +122,25 @@ export default function HeroSection({
   // в тёмной (лама на чёрном) текст остаётся светлым на всех ширинах
   const onLightBg = !darkTheme
 
+  // Скраб — главная интерактивная фича hero, но без подсказки необнаружима:
+  // хинт всплывает, если мышь не двигалась первые ~2.5 с, и тает при
+  // первом движении (двигал раньше — уже скрабит, хинт не нужен)
+  const [hintVisible, setHintVisible] = useState(false)
+  useEffect(() => {
+    if (!window.matchMedia('(pointer: fine)').matches) return
+    const timer = window.setTimeout(() => setHintVisible(true), 2600)
+    const onMove = () => {
+      window.clearTimeout(timer)
+      setHintVisible(false)
+      window.removeEventListener('mousemove', onMove)
+    }
+    window.addEventListener('mousemove', onMove, { passive: true })
+    return () => {
+      window.clearTimeout(timer)
+      window.removeEventListener('mousemove', onMove)
+    }
+  }, [])
+
   return (
     <section
       id="top"
@@ -148,7 +168,7 @@ export default function HeroSection({
               <a
                 key={link.href}
                 href={link.href}
-                className={`whitespace-nowrap text-[11px] font-medium uppercase tracking-wider text-[#D7E2EA] transition-opacity duration-200 hover:opacity-70 sm:text-sm md:text-lg lg:text-[1.4rem] ${onLightBg ? 'lg:text-[#0C0C0C]' : ''}`}
+                className={`relative whitespace-nowrap text-[11px] font-medium uppercase tracking-wider text-[#D7E2EA] after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:w-full after:origin-left after:scale-x-0 after:bg-[#FF6A00] after:transition-transform after:duration-300 hover:after:scale-x-100 sm:text-sm md:text-lg lg:text-[1.4rem] ${onLightBg ? 'lg:text-[#0C0C0C]' : ''}`}
               >
                 {link.label}
               </a>
@@ -170,6 +190,24 @@ export default function HeroSection({
             </h1>
           </FadeIn>
         </div>
+
+        <AnimatePresence>
+          {hintVisible && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+              className={`pointer-events-none absolute bottom-28 left-1/2 z-10 hidden -translate-x-1/2 items-center gap-2 rounded-full border px-4 py-2 text-xs font-medium uppercase tracking-widest backdrop-blur-sm lg:flex ${
+                onLightBg
+                  ? 'border-black/15 bg-white/30 text-black/70'
+                  : 'border-white/15 bg-white/5 text-[#D7E2EA]/80'
+              }`}
+            >
+              ← поводите мышью →
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <div className="relative z-10 mt-auto flex items-end justify-between px-6 pb-7 sm:pb-8 md:px-10 md:pb-10">
           <FadeIn delay={0.35} y={20}>

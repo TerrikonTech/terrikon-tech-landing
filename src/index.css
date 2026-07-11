@@ -14,6 +14,17 @@ body,
   background-color: #0c0c0c;
 }
 
+html {
+  /* якорная навигация без телепорта; при reduced-motion — мгновенно */
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 body {
   font-family: 'Golos Text', sans-serif;
 }

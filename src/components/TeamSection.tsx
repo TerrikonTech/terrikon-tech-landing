@@ -65,8 +65,8 @@ export default function TeamSection() {
             Команда
           </h2>
           <p className="mx-auto mt-6 max-w-xl font-normal leading-relaxed text-[#D7E2EA]/60 sm:text-lg">
-            Мы сами пишем свои проекты — двое разработчиков из Донецка, чтобы
-            каждая идея доезжала до продакшена.
+            Нас двое, и код мы пишем сами — между вашей идеей и продакшеном
+            нет посредников.
           </p>
         </FadeIn>
 
@@ -96,7 +96,7 @@ export default function TeamSection() {
                 <h3 className="relative z-10 mt-5 text-xl font-semibold text-[#D7E2EA]">
                   {member.name}
                 </h3>
-                <p className="relative z-10 mt-1 text-sm text-[#D7E2EA]/50">
+                <p className="relative z-10 mt-1 text-sm text-[#D7E2EA]/65">
                   {member.designation}
                 </p>
               </div>

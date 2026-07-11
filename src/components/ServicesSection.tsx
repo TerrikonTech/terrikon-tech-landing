@@ -53,7 +53,7 @@ export default function ServicesSection() {
         {SERVICES.map((service, i) => (
           <FadeIn key={service.number} delay={i * 0.1}>
             <div
-              className="flex items-start gap-6 py-8 sm:gap-10 sm:py-10 md:gap-16 md:py-12"
+              className="flex flex-col gap-2 py-8 sm:gap-3 sm:py-10 md:py-12"
               style={{
                 borderBottom:
                   i < SERVICES.length - 1
@@ -61,26 +61,26 @@ export default function ServicesSection() {
                     : undefined,
               }}
             >
+              {/* Услуги — не последовательность шагов: гигантские цифры
+                  демонтированы в каталожный индекс, вес — названию услуги */}
               <span
-                className="font-display font-black leading-none text-[#0C0C0C]"
-                style={{ fontSize: 'clamp(2.6rem, 8.5vw, 120px)' }}
+                className="text-xs font-semibold uppercase tracking-[0.3em] text-[#FF6A00] sm:text-sm"
+                style={{ fontVariantNumeric: 'tabular-nums' }}
               >
                 {service.number}
               </span>
-              <div className="flex flex-col gap-2 pt-2 sm:gap-3 md:pt-4">
-                <h3
-                  className="font-display font-semibold text-[#0C0C0C]"
-                  style={{ fontSize: 'clamp(1rem, 2vw, 1.8rem)' }}
-                >
-                  {service.name}
-                </h3>
-                <p
-                  className="max-w-2xl font-normal leading-relaxed text-[#0C0C0C] opacity-60"
-                  style={{ fontSize: 'clamp(0.85rem, 1.6vw, 1.25rem)' }}
-                >
-                  {service.description}
-                </p>
-              </div>
+              <h3
+                className="font-display font-semibold text-[#0C0C0C]"
+                style={{ fontSize: 'clamp(1.35rem, 2.8vw, 2.5rem)' }}
+              >
+                {service.name}
+              </h3>
+              <p
+                className="max-w-2xl font-normal leading-relaxed text-[#0C0C0C] opacity-60"
+                style={{ fontSize: 'clamp(0.85rem, 1.6vw, 1.25rem)' }}
+              >
+                {service.description}
+              </p>
             </div>
           </FadeIn>
         ))}

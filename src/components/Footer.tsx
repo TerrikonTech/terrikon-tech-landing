@@ -5,19 +5,16 @@ import { TELEGRAM_URL } from './ContactButton'
 // Футер в духе Nur/ui: колонки ссылок, разделитель, соцлинк + копирайт
 // и гигантский контурный водяной знак «ТЕРРИКОН», обрезанный снизу
 
+// Одна колонка «Меню»: «Полезные ссылки» с «Наверх» внутри — рыбный
+// заголовок, навигация по сайту и есть меню
 const NAV_COLUMNS = [
   {
-    title: 'О нас',
+    title: 'Меню',
     links: [
       { label: 'О студии', href: '#about' },
-      { label: 'Команда', href: '#team' },
-      { label: 'Проекты', href: '#projects' },
-    ],
-  },
-  {
-    title: 'Полезные ссылки',
-    links: [
       { label: 'Услуги', href: '#price' },
+      { label: 'Проекты', href: '#projects' },
+      { label: 'Команда', href: '#team' },
       { label: 'Наверх', href: '#top' },
     ],
   },
@@ -31,14 +28,14 @@ export default function Footer() {
     >
       <div className="relative z-10 mx-auto grid max-w-6xl grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
         {/* Лого + описание */}
-        <div>
+        <div className="lg:col-span-2">
           <div className="flex items-center gap-2.5">
             <LogoMark className="h-7 w-8 bg-[#BBCCD7]" />
             <span className="font-display text-2xl font-bold tracking-tight text-white">
               Террикон
             </span>
           </div>
-          <p className="mt-4 max-w-[260px] text-sm leading-relaxed text-[#D7E2EA]/50">
+          <p className="mt-4 max-w-[260px] text-sm leading-relaxed text-[#D7E2EA]/65">
             Террикон — студия из Донецка: сайты, приложения и 3D, которые
             запоминаются.
           </p>
@@ -85,7 +82,7 @@ export default function Footer() {
       <div className="relative z-10 mx-auto mt-16 max-w-6xl border-t border-white/10" />
 
       <div className="relative z-10 mx-auto flex max-w-6xl items-center justify-end py-8">
-        <p className="text-xs text-[#D7E2EA]/40 sm:text-sm">
+        <p className="text-xs text-[#D7E2EA]/60 sm:text-sm">
           © 2026 Террикон. Все права защищены.
         </p>
       </div>

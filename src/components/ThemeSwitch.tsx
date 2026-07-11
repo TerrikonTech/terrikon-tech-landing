@@ -26,7 +26,7 @@ export default function ThemeSwitch({
       aria-checked={checked}
       aria-label="Переключить тёмную тему"
       onClick={() => onChange(!checked)}
-      className="flex shrink-0 items-center gap-1.5 sm:gap-2"
+      className="-m-2.5 flex shrink-0 items-center gap-1.5 p-2.5 sm:gap-2"
     >
       <Sun
         strokeWidth={2}
