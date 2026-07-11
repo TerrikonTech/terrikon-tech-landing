@@ -11,8 +11,9 @@ import TerrikonRidge from './components/TerrikonRidge'
 import Footer from './components/Footer'
 
 export default function App() {
+  // Тёмная — дефолт: светлая только если выбрана явно
   const [darkTheme, setDarkTheme] = useState(
-    () => localStorage.getItem('jack-theme') === 'dark',
+    () => localStorage.getItem('jack-theme') !== 'light',
   )
 
   useEffect(() => {
