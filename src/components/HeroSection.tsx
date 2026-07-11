@@ -223,7 +223,7 @@ export default function HeroSection({
             </p>
           </FadeIn>
           <FadeIn delay={0.5} y={20}>
-            <ContactButton onLightBg={onLightBg} />
+            <ContactButton variant="glass" onLightBg={onLightBg} />
           </FadeIn>
         </div>
       </div>

@@ -4,33 +4,44 @@ import type { CSSProperties, ReactNode } from 'react'
 export const TELEGRAM_URL = 'https://t.me/Zotov_O'
 
 interface ContactButtonProps {
-  /** true — кнопка лежит на светлом фоне видео (lg, светлая тема) */
+  /** true — кнопка лежит на светлом фоне видео (lg, светлая тема); только для glass */
   onLightBg?: boolean
-  /** dark — сплошная тёмная пилюля для белых секций: стекло на белом не читается */
-  variant?: 'glass' | 'dark'
+  /**
+   * glass — liquid glass (hero);
+   * light — белая плоская кнопка для тёмных секций (дефолт);
+   * dark  — чёрная плоская кнопка для белой секции «Услуги»
+   */
+  variant?: 'glass' | 'light' | 'dark'
   children?: ReactNode
 }
 
-const SHARED =
-  'relative inline-flex origin-center cursor-pointer select-none items-center justify-center rounded-full px-8 py-3 outline-none transition-[transform,box-shadow] duration-[400ms] ease-[cubic-bezier(0.4,1.5,0.3,1)] hover:scale-[1.03] hover:shadow-[0_0_32px_rgba(255,106,0,0.28)] active:scale-[0.96] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#FF6A00] sm:px-10 sm:py-3.5 md:px-12 md:py-4'
+const BASE =
+  'relative inline-flex origin-center cursor-pointer select-none items-center justify-center rounded-full border-0 px-8 py-3 outline-none transition-[transform,box-shadow] duration-[400ms] ease-[cubic-bezier(0.4,1.5,0.3,1)] hover:scale-[1.03] active:scale-[0.96] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#FF6A00] sm:px-10 sm:py-3.5 md:px-12 md:py-4'
 
-// Кнопка в духе Apple Tahoe liquid glass (easemize/apple-tahoe-liquid-glass-button,
-// 21st.dev). Портирован standalone-режим (svg-mode): стеклянный слой на
-// backdrop-filter + пакет внутренних теней + световой ободок. Динамический
-// анализ преломления из LiquidGlassViewport не переносим — он работает только
-// поверх статичной картинки, а у нас фон hero — живое видео.
+const LINK = {
+  href: TELEGRAM_URL,
+  target: '_blank',
+  rel: 'noopener noreferrer',
+} as const
+
+// Плоские кнопки: белая (текст #0C0C0C) на тёмных секциях, чёрная (текст
+// белый) на белой секции «Услуги». Hero — liquid glass в духе Apple Tahoe
+// (easemize/apple-tahoe-liquid-glass-button, 21st.dev): стеклянный слой на
+// backdrop-filter + пакет внутренних теней + световой ободок.
 export default function ContactButton({
   onLightBg = false,
-  variant = 'glass',
+  variant = 'light',
   children = 'Связаться',
 }: ContactButtonProps) {
-  if (variant === 'dark') {
+  if (variant !== 'glass') {
+    const solid =
+      variant === 'dark'
+        ? 'bg-[#0C0C0C] text-white shadow-[0_6px_20px_-8px_rgba(0,0,0,0.5)] hover:shadow-[0_10px_26px_-8px_rgba(0,0,0,0.6)]'
+        : 'bg-white text-[#0C0C0C] shadow-[0_6px_20px_-8px_rgba(0,0,0,0.55)] hover:shadow-[0_10px_28px_-8px_rgba(0,0,0,0.45)]'
     return (
       <a
-        href={TELEGRAM_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={`${SHARED} bg-[#0C0C0C] text-xs font-semibold uppercase tracking-widest text-white/95 sm:text-sm md:text-base`}
+        {...LINK}
+        className={`${BASE} text-xs font-semibold uppercase tracking-widest sm:text-sm md:text-base ${solid}`}
       >
         {children}
       </a>
@@ -39,10 +50,8 @@ export default function ContactButton({
 
   return (
     <a
-      href={TELEGRAM_URL}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={`${SHARED} border-0 bg-transparent`}
+      {...LINK}
+      className={`${BASE} bg-transparent hover:shadow-[0_0_32px_rgba(255,106,0,0.28)]`}
       style={
         {
           '--cos': '0',
