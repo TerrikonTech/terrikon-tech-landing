@@ -8,6 +8,7 @@ import LogoMark from './LogoMark'
 
 const NAV_LINKS = [
   { label: 'О нас', href: '#about' },
+  { label: 'Услуги', href: '#services' },
   { label: 'Проекты', href: '#projects' },
   { label: 'Контакт', href: '#contact' },
 ]
