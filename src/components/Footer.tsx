@@ -63,13 +63,19 @@ export default function Footer() {
         {/* Контакты — единственное целевое действие, поэтому кнопка, не строчка */}
         <div>
           <h3 className="text-base font-semibold text-white">Контакты</h3>
+          {/* Оранжевое стекло в языке liquid-glass кнопок hero:
+              полупрозрачная заливка + blur + световой ободок + glow */}
           <a
             href={TELEGRAM_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-5 inline-flex items-center gap-2.5 rounded-full bg-[#FF6A00] px-6 py-3 text-sm font-semibold text-[#0C0C0C] transition-transform hover:scale-[1.04] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#FF6A00] active:scale-[0.97]"
+            className="mt-5 inline-flex items-center gap-2.5 rounded-full border border-[#FF6A00]/50 bg-[#FF6A00]/20 px-6 py-3 text-sm font-semibold text-white backdrop-blur-md transition-[transform,box-shadow,background-color] duration-300 hover:scale-[1.04] hover:bg-[#FF6A00]/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#FF6A00] active:scale-[0.97]"
+            style={{
+              boxShadow:
+                'inset 0 1px 0 rgba(255,255,255,0.28), inset 0 -6px 12px -8px rgba(255,106,0,0.55), 0 0 22px rgba(255,106,0,0.18)',
+            }}
           >
-            <Send className="h-4 w-4" />
+            <Send className="h-4 w-4 text-[#FF6A00]" />
             Написать в Telegram
           </a>
           <p className="mt-3 text-sm leading-relaxed text-[#D7E2EA]/60">
