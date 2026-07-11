@@ -32,6 +32,51 @@
     <meta property="og:image:height" content="630" />
     <meta property="og:locale" content="ru_RU" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="robots" content="index, follow" />
+    <meta
+      name="keywords"
+      content="разработка сайтов, веб-студия, лендинг под ключ, разработка приложений, Telegram Mini Apps, 3D для сайта, Террикон, Донецк"
+    />
+    <!-- Верификация кабинетов: вставить коды после регистрации.
+         Яндекс.Вебмастер: <meta name="yandex-verification" content="..." />
+         Google Search Console: <meta name="google-site-verification" content="..." /> -->
+    <!-- Структурированные данные: студия как организация с услугами -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "ProfessionalService",
+        "name": "Террикон Тех",
+        "alternateName": "TerrikonTech",
+        "url": "https://terrikontech.vercel.app/",
+        "logo": "https://terrikontech.vercel.app/logo-mark.png",
+        "image": "https://terrikontech.vercel.app/og.jpg",
+        "description": "Студия разработки из Донецка: продающие лендинги, веб- и мобильные приложения, нагруженные платформы и 3D-моушн. Двое инженеров ведут проект от идеи до продакшена.",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Донецк",
+          "addressCountry": "RU"
+        },
+        "founder": [
+          { "@type": "Person", "name": "Олег Зотов" },
+          { "@type": "Person", "name": "Савелий Спорышев" }
+        ],
+        "sameAs": ["https://github.com/TerrikonTech"],
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "contactType": "sales",
+          "url": "https://t.me/Zotov_O",
+          "availableLanguage": "ru"
+        },
+        "knowsAbout": [
+          "разработка сайтов",
+          "лендинги",
+          "веб-приложения",
+          "Telegram Mini Apps",
+          "высоконагруженные платформы",
+          "3D и моушн-дизайн"
+        ]
+      }
+    </script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -43,6 +88,34 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- Контент для краулеров без исполнения JS (текст совпадает с тем,
+         что рендерит приложение — не клоакинг, а копия) -->
+    <noscript>
+      <main style="font-family: sans-serif; max-width: 640px; margin: 0 auto; padding: 24px">
+        <h1>Террикон Тех — студия разработки: сайты, приложения, 3D</h1>
+        <p>
+          Мы — Террикон, студия разработки из Донецка. Никаких
+          менеджеров-прослоек: вы говорите напрямую с теми, кто пишет код.
+          Двое инженеров ведут проект от макета до сервера — сайты,
+          приложения, 3D и моушн.
+        </p>
+        <h2>Услуги</h2>
+        <ul>
+          <li>Лендинги под ключ — продающие лендинги от макета до продакшена: дизайн, вёрстка, анимации, деплой и аналитика.</li>
+          <li>Фулстек-разработка — фронтенд, бэкенд, базы данных, API и интеграции: одна команда от архитектуры до релиза.</li>
+          <li>Приложения — веб- и мобильные приложения: PWA, Telegram Mini Apps, личные кабинеты.</li>
+          <li>Платформы и сервисы — нагруженные онлайн-платформы: карты и реалтайм, админки, платежи, аналитика.</li>
+          <li>Программное обеспечение — автоматизация, боты, парсеры, интеграции с железом и внешними API.</li>
+        </ul>
+        <h2>Команда</h2>
+        <p>Олег Зотов и Савелий Спорышев — сооснователи, разработка.</p>
+        <h2>Контакты</h2>
+        <p>
+          Telegram: <a href="https://t.me/Zotov_O">t.me/Zotov_O</a>. Отвечаем
+          в течение дня.
+        </p>
+      </main>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
