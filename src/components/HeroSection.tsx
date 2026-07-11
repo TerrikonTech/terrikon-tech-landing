@@ -84,7 +84,7 @@ function ScrubVideo({ src, dark }: { src: string; dark: boolean }) {
           playsInline
           preload="auto"
           src={src}
-          aria-label="Джек — видео-портрет 3D-художника"
+          aria-label="Террикон Тех — видео-портрет"
           className={`h-full w-full object-cover lg:object-right-bottom ${
             // мобильный кроп: лама стоит в центре кадра, манекен — правее (~68%);
             // общий object-right резал ламу пополам
@@ -153,9 +153,9 @@ export default function HeroSection({
         <div className="relative z-[1] overflow-hidden">
           <FadeIn delay={0.15} y={40}>
             <h1
-              className={`hero-heading ${onLightBg ? 'hero-heading-on-video' : ''} mt-6 w-full whitespace-nowrap text-center font-display text-[12.5vw] font-black leading-none tracking-tight sm:mt-4 md:-mt-5`}
+              className={`hero-heading ${onLightBg ? 'hero-heading-on-video' : ''} mt-6 w-full whitespace-nowrap text-center font-display text-[11.2vw] font-black leading-none tracking-tight sm:mt-4 md:-mt-5`}
             >
-              Хай, я Джек
+              Террикон Тех
             </h1>
           </FadeIn>
         </div>
@@ -166,7 +166,8 @@ export default function HeroSection({
               className={`max-w-[180px] font-normal leading-snug text-[#D7E2EA] sm:max-w-[240px] md:max-w-[280px] ${onLightBg ? 'lg:text-[#0C0C0C]' : ''}`}
               style={{ fontSize: 'clamp(0.75rem, 1.4vw, 1.5rem)' }}
             >
-              3D-художник, одержимый созданием ярких и незабываемых проектов
+              Простые парни, одержимые созданием ярких и незабываемых
+              проектов
             </p>
           </FadeIn>
           <FadeIn delay={0.5} y={20}>
