@@ -13,7 +13,7 @@ const NAV_COLUMNS = [
     title: 'Меню',
     links: [
       { label: 'О студии', href: '#about' },
-      { label: 'Услуги', href: '#price' },
+      { label: 'Услуги', href: '#services' },
       { label: 'Проекты', href: '#projects' },
       { label: 'Команда', href: '#team' },
       { label: 'Наверх', href: '#top' },
