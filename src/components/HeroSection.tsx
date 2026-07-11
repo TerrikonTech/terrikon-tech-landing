@@ -85,9 +85,12 @@ function ScrubVideo({ src, dark }: { src: string; dark: boolean }) {
           preload="auto"
           src={src}
           aria-label="Террикон Тех — видео-портрет"
-          className={`h-full w-full object-cover lg:object-right-bottom ${
+          className={`h-full w-full object-cover lg:object-right-top ${
             // мобильный кроп: лама стоит в центре кадра, манекен — правее (~68%);
-            // общий object-right резал ламу пополам
+            // общий object-right резал ламу пополам.
+            // lg-якорь top (не bottom): на окнах шире 16:9 запас кропа
+            // вертикальный, и с якорем bottom голова прижималась к верху,
+            // залезая под навбар — с top фигура опускается, режется низ
             dark ? 'object-center' : 'object-[68%_50%]'
           }`}
         />
