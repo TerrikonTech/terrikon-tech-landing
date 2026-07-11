@@ -104,12 +104,12 @@ export default function TeamSection() {
             Команда
           </h2>
           <p className="mx-auto mt-6 max-w-xl font-normal leading-relaxed text-[#D7E2EA]/60 sm:text-lg">
-            Нас двое, и код мы пишем сами — между вашей идеей и продакшеном
-            нет посредников.
+            Ядро студии — мы двое, на связи напрямую. Под задачи проекта
+            подключаем свою команду: инженеры, дизайнеры, 3D и моушн.
           </p>
         </FadeIn>
 
-        <div className="grid w-full max-w-3xl grid-cols-1 items-stretch gap-8 md:grid-cols-2 lg:gap-12">
+        <div className="grid w-full max-w-5xl grid-cols-1 items-stretch gap-8 md:grid-cols-3 lg:gap-10">
           {MEMBERS.map((member, index) => (
             <FadeIn key={member.name} delay={index * 0.15} y={30} className="h-full">
               <TiltCard className="group relative flex h-full flex-col items-center justify-end overflow-hidden rounded-xl bg-[#141414] p-8 text-center shadow-lg transition-shadow duration-300 ease-in-out hover:shadow-2xl">
@@ -141,6 +141,27 @@ export default function TeamSection() {
               </TiltCard>
             </FadeIn>
           ))}
+
+          {/* Остальная команда — без портретов, счётчиком */}
+          <FadeIn delay={0.3} y={30} className="h-full">
+            <TiltCard className="group relative flex h-full flex-col items-center justify-end overflow-hidden rounded-xl bg-[#141414] p-8 text-center shadow-lg transition-shadow duration-300 ease-in-out hover:shadow-2xl">
+              <div
+                className="absolute bottom-0 left-0 right-0 h-1/2 origin-bottom scale-y-0 transform rounded-t-full bg-gradient-to-t from-[#BBCCD7]/20 to-transparent transition-transform duration-500 ease-out group-hover:scale-y-100"
+                style={{ transitionDelay: '100ms' }}
+              />
+              <div className="relative z-10 flex h-36 w-36 items-center justify-center rounded-full border-4 border-transparent bg-white/5 transition-all duration-500 ease-out group-hover:scale-105 group-hover:border-[#FF6A00]">
+                <span className="font-display text-4xl font-bold text-[#FF6A00]">
+                  +19
+                </span>
+              </div>
+              <h3 className="relative z-10 mt-5 text-xl font-semibold text-[#D7E2EA]">
+                И ещё 19 человек
+              </h3>
+              <p className="relative z-10 mt-1 text-sm text-[#D7E2EA]/65">
+                Инженеры, дизайнеры, 3D и моушн — под задачи проекта
+              </p>
+            </TiltCard>
+          </FadeIn>
         </div>
       </div>
     </section>
