@@ -58,6 +58,12 @@ vec2 atlasMask(vec2 uv, float idx) {
 
 void main() {
   vec2 uv = vUV * uScale + uOffset;
+  // contain-режим: канвас шире видео, по бокам поля — там прозрачность,
+  // иначе CLAMP_TO_EDGE размазал бы крайние пиксели кадра
+  if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) {
+    gl_FragColor = vec4(0.0);
+    return;
+  }
   vec4 c = texture2D(uTex, uv);
   vec3 rgb;
   float a;
@@ -185,9 +191,9 @@ export default function SubjectKeyCanvas({
       const uOffset = gl.getUniformLocation(prog, 'uOffset')
       const uFrame = gl.getUniformLocation(prog, 'uFrame')
 
-      // Повторяем object-fit: cover с якорем right-top, как у <video> на lg
-      // (top, не bottom: на окнах шире 16:9 фигура опускается вниз,
-      // а не прижимается головой к навбару)
+      // Повторяем object-fit <video> на lg: cover с якорем right-top;
+      // тёмная тема на окнах шире 16/9 — contain по высоте с центровкой
+      // (та же логика, что в className видео — иначе вырезка разъедется)
       const updateCover = () => {
         const cw = canvas.clientWidth
         const ch = canvas.clientHeight
@@ -198,11 +204,16 @@ export default function SubjectKeyCanvas({
         canvas.width = Math.round(cw * dpr)
         canvas.height = Math.round(ch * dpr)
         gl.viewport(0, 0, canvas.width, canvas.height)
-        const s = Math.max(cw / vw, ch / vh)
+        const contain = dark && cw / ch >= 16 / 9
+        const s = contain
+          ? Math.min(cw / vw, ch / vh)
+          : Math.max(cw / vw, ch / vh)
         const dw = vw * s
         const dh = vh * s
         gl.uniform2f(uScale, cw / dw, ch / dh)
-        gl.uniform2f(uOffset, (dw - cw) / dw, 0)
+        // contain: видео по центру (offset отрицательный — поля по бокам,
+        // шейдер гасит uv вне [0,1]); cover: якорь right
+        gl.uniform2f(uOffset, contain ? -(cw - dw) / 2 / dw : (dw - cw) / dw, 0)
       }
       const ro = new ResizeObserver(updateCover)
       ro.observe(canvas)

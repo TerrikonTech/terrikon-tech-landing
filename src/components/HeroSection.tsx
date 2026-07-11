@@ -90,8 +90,16 @@ function ScrubVideo({ src, dark }: { src: string; dark: boolean }) {
             // общий object-right резал ламу пополам.
             // lg-якорь top (не bottom): на окнах шире 16:9 запас кропа
             // вертикальный, и с якорем bottom голова прижималась к верху,
-            // залезая под навбар — с top фигура опускается, режется низ
-            dark ? 'object-center' : 'object-[68%_50%]'
+            // залезая под навбар — с top фигура опускается, режется низ.
+            // Тёмная на окнах шире 16:9 — contain по высоте с центровкой:
+            // cover раздувал ламу (плечи под обрезом); фон видео чёрный,
+            // боковые поля сливаются с фоном секции. В точке 16:9
+            // contain == cover — переход бесшовный
+            // + растворение боковых краёв: фон видео чуть светлее #0C0C0C,
+            // без маски виден вертикальный стык на полях contain
+            dark
+              ? 'object-center [@media(min-aspect-ratio:16/9)]:lg:object-contain [@media(min-aspect-ratio:16/9)]:lg:object-top [@media(min-aspect-ratio:16/9)]:lg:[-webkit-mask-image:linear-gradient(to_right,transparent_10%,black_24%,black_76%,transparent_90%)] [@media(min-aspect-ratio:16/9)]:lg:[mask-image:linear-gradient(to_right,transparent_10%,black_24%,black_76%,transparent_90%)]'
+              : 'object-[68%_50%]'
           }`}
         />
       </div>
