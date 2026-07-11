@@ -1,3 +1,5 @@
+import { motion } from 'framer-motion'
+
 // Свой графический язык сайта (см. DESIGN.md): контурные силуэты со
 // штриховкой и сигнальным огоньком #FF6A00 — как TerrikonRidge.
 // Четыре глифа кодируют то, о чём текст «О нас»: сайты, приложения,
@@ -6,6 +8,34 @@
 const STROKE = { stroke: '#BBCCD7', strokeOpacity: 0.3, strokeWidth: 2, fill: 'none' }
 const HATCH = { stroke: '#BBCCD7', strokeOpacity: 0.12, strokeWidth: 1.5 }
 const DOT = '#FF6A00'
+
+/** Сигнальный огонёк с расходящимся пульс-кольцом; delay разводит глифы,
+    чтобы огоньки перемигивались по очереди */
+function SignalDot({ cx, cy, delay = 0 }: { cx: number; cy: number; delay?: number }) {
+  return (
+    <>
+      <circle cx={cx} cy={cy} r="3.5" fill={DOT} />
+      <motion.circle
+        cx={cx}
+        cy={cy}
+        r="4"
+        fill="none"
+        stroke={DOT}
+        strokeWidth="1.5"
+        style={{ transformBox: 'fill-box', transformOrigin: 'center' }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: [0.6, 0], scale: [1, 2.8] }}
+        transition={{
+          delay,
+          duration: 2.2,
+          repeat: Infinity,
+          repeatDelay: 2.6,
+          ease: 'easeOut',
+        }}
+      />
+    </>
+  )
+}
 
 /** Сайты: окно браузера, курсор с огоньком */
 export function GlyphSite({ className }: { className?: string }) {
@@ -23,7 +53,7 @@ export function GlyphSite({ className }: { className?: string }) {
         <path d="M22 64 L52 64" />
         <path d="M22 74 L40 74" />
       </g>
-      <circle cx="84" cy="82" r="3.5" fill={DOT} />
+      <SignalDot cx={84} cy={82} delay={0} />
     </svg>
   )
 }
@@ -42,7 +72,7 @@ export function GlyphApp({ className }: { className?: string }) {
         <path d="M46 66 L66 66" />
         <path d="M46 74 L70 74" />
       </g>
-      <circle cx="82" cy="16" r="3.5" fill={DOT} />
+      <SignalDot cx={82} cy={16} delay={1.2} />
     </svg>
   )
 }
@@ -61,7 +91,7 @@ export function GlyphCube({ className }: { className?: string }) {
         <path d="M28 60 L52 73" />
         <path d="M28 72 L44 81" />
       </g>
-      <circle cx="60" cy="14" r="3.5" fill={DOT} />
+      <SignalDot cx={60} cy={14} delay={2.4} />
     </svg>
   )
 }
@@ -79,7 +109,7 @@ export function GlyphMotion({ className }: { className?: string }) {
         <path d="M40 100 L48 100" />
         <path d="M54 100 L58 100" />
       </g>
-      <circle cx="100" cy="34" r="3.5" fill={DOT} />
+      <SignalDot cx={100} cy={34} delay={3.6} />
     </svg>
   )
 }

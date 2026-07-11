@@ -12,7 +12,7 @@ interface ContactButtonProps {
 }
 
 const SHARED =
-  'relative inline-flex origin-center cursor-pointer select-none items-center justify-center rounded-full px-8 py-3 outline-none transition-transform duration-[400ms] ease-[cubic-bezier(0.4,1.5,0.3,1)] hover:scale-[1.03] active:scale-[0.96] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#FF6A00] sm:px-10 sm:py-3.5 md:px-12 md:py-4'
+  'relative inline-flex origin-center cursor-pointer select-none items-center justify-center rounded-full px-8 py-3 outline-none transition-[transform,box-shadow] duration-[400ms] ease-[cubic-bezier(0.4,1.5,0.3,1)] hover:scale-[1.03] hover:shadow-[0_0_32px_rgba(255,106,0,0.28)] active:scale-[0.96] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#FF6A00] sm:px-10 sm:py-3.5 md:px-12 md:py-4'
 
 // Кнопка в духе Apple Tahoe liquid glass (easemize/apple-tahoe-liquid-glass-button,
 // 21st.dev). Портирован standalone-режим (svg-mode): стеклянный слой на

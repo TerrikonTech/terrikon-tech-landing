@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion'
 import { Send } from 'lucide-react'
 import LogoMark from './LogoMark'
 import { TELEGRAM_URL } from './ContactButton'
@@ -91,8 +92,14 @@ export default function Footer() {
           Размер от вьюпорта: «Террикон» в Unbounded-900 = 6.19em шириной
           (замер Range API) → 15.8vw = ~98% ширины, влезает на любом
           вьюпорте */}
-      <div
+      {/* Слово вырастает из-под нижней кромки, как растёт отвал
+          (у футера overflow-hidden — выезд из-под края бесшовный) */}
+      <motion.div
         aria-hidden="true"
+        initial={{ y: '55%' }}
+        whileInView={{ y: 0 }}
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{ type: 'spring', stiffness: 50, damping: 16, mass: 1.1 }}
         className="pointer-events-none relative z-0 -mx-6 select-none whitespace-nowrap text-center font-display font-black leading-none tracking-tight sm:-mx-10 md:-mx-16"
         style={{
           fontSize: 'min(15.8vw, 280px)',
@@ -105,7 +112,7 @@ export default function Footer() {
         }}
       >
         Террикон
-      </div>
+      </motion.div>
     </footer>
   )
 }
