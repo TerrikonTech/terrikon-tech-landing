@@ -31,3 +31,4 @@ dist/
 *.key
 *.db
 extra_admins.json
+.vercel
