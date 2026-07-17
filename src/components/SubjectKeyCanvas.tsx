@@ -261,10 +261,17 @@ export default function SubjectKeyCanvas({
       }
     }
 
-    // Работает на всех ширинах: на мобиле видео — фон hero, и фигура
-    // должна перекрывать заголовок так же, как на десктопе
-    start()
+    // На тач-устройствах первый экран остаётся лёгким: poster виден сразу,
+    // а WebGL, атлас маски и покадровый цикл включаются вместе с видео
+    // после первого взаимодействия. На десктопе скраб доступен сразу.
+    const coarsePointer = window.matchMedia('(pointer: coarse)').matches
+    if (coarsePointer) {
+      video.addEventListener('playing', start, { once: true })
+    } else {
+      start()
+    }
     return () => {
+      video.removeEventListener('playing', start)
       cleanupGL?.()
       cleanupGL = null
     }

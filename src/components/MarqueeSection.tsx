@@ -27,6 +27,42 @@ export const MARQUEE_IMAGES = [
 const ROW_1 = MARQUEE_IMAGES.slice(0, 11)
 const ROW_2 = MARQUEE_IMAGES.slice(11)
 
+function DeferredMarqueeImage({ src }: { src: string }) {
+  const imageRef = useRef<HTMLImageElement>(null)
+  const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    const image = imageRef.current
+    if (!image || !('IntersectionObserver' in window)) {
+      setVisible(true)
+      return
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return
+        setVisible(true)
+        observer.disconnect()
+      },
+      { rootMargin: '200px' },
+    )
+    observer.observe(image)
+    return () => observer.disconnect()
+  }, [])
+
+  return (
+    <img
+      ref={imageRef}
+      src={visible ? src : undefined}
+      alt=""
+      loading="lazy"
+      decoding="async"
+      className="rounded-2xl bg-white/5 object-cover"
+      style={{ width: 420, height: 270, flexShrink: 0 }}
+    />
+  )
+}
+
 interface MarqueeRowProps {
   images: string[]
   transform: string
@@ -40,14 +76,7 @@ function MarqueeRow({ images, transform }: MarqueeRowProps) {
       style={{ transform, willChange: 'transform' }}
     >
       {tripled.map((src, i) => (
-        <img
-          key={i}
-          src={src}
-          alt=""
-          loading="lazy"
-          className="rounded-2xl object-cover"
-          style={{ width: 420, height: 270, flexShrink: 0 }}
-        />
+        <DeferredMarqueeImage key={i} src={src} />
       ))}
     </div>
   )
