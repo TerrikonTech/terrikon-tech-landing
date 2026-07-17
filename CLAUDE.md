@@ -27,6 +27,6 @@
 - `npm run build` — прод-сборка (`tsc` + `vite build`) в `dist/`.
 - Скраб-видео — локальные all-intra mp4 в `public/` (не заменять на обычные: развалится плавность сика). Лого — альфа-маска `public/logo-mark.png` + CSS mask (цвета строго #BBCCD7 или чёрный).
 - Дизайн-система — [DESIGN.md](DESIGN.md): токены, типографика, графический язык, правило акцента, механика hero-масок. Читать перед любой правкой UI.
-- Прод: https://terrikontech.vercel.app (Vercel-проект terrikontech). Пуш в репо на прод НЕ выезжает — деплой ручной, С ПРЕРЕНДЕРОМ (Яндекс ненадёжно рендерит JS):
+- Прод: https://www.terrikontech.ru (Vercel-проект terrikontech). Пуш в репо на прод НЕ выезжает — деплой ручной, С ПРЕРЕНДЕРОМ (Яндекс ненадёжно рендерит JS):
   `npx vercel build --prod && python scripts/prerender.py .vercel/output/static && npx vercel deploy --prebuilt --prod`.
-  Прямой `npx vercel --prod` соберёт БЕЗ пререндера — SEO-контент из статики пропадёт. После деплоя дёрнуть IndexNow (ключ-файл в public/): `curl "https://yandex.com/indexnow?url=https://terrikontech.vercel.app/&key=<ключ>"`.
+  Прямой `npx vercel --prod` соберёт БЕЗ пререндера — SEO-контент из статики пропадёт. После деплоя дёрнуть IndexNow (ключ-файл в public/): `curl "https://yandex.com/indexnow?url=https://www.terrikontech.ru/&key=<ключ>"`.
