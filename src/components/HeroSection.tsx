@@ -235,8 +235,7 @@ export default function HeroSection({
               className={`max-w-[180px] font-normal leading-snug sm:max-w-[240px] md:max-w-[280px] ${onLightBg ? 'text-[#0C0C0C]' : 'text-[#D7E2EA]'}`}
               style={{ fontSize: 'clamp(0.75rem, 1.4vw, 1.5rem)' }}
             >
-              Простые парни, одержимые созданием ярких и незабываемых
-              проектов
+              Создаём сайты и цифровые продукты в Донецке и по всей России
             </p>
           </div>
           <div>

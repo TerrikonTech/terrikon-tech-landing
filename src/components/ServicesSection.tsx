@@ -4,9 +4,9 @@ import ContactButton from './ContactButton'
 const SERVICES = [
   {
     number: '01',
-    name: 'Лендинги под ключ',
+    name: 'Сайты и лендинги под ключ',
     description:
-      'Продающие лендинги от макета до продакшена: дизайн, вёрстка, анимации, деплой и аналитика — за считанные дни.',
+      'Создание сайтов и лендингов под ключ: дизайн, вёрстка, анимации, деплой и аналитика — за считанные дни.',
   },
   {
     number: '02',
@@ -41,6 +41,9 @@ export default function ServicesSection() {
       className="rounded-t-[40px] bg-[#FFFFFF] px-5 py-20 sm:rounded-t-[50px] sm:px-8 sm:py-24 md:rounded-t-[60px] md:px-10 md:py-32"
     >
       <FadeIn y={40}>
+        <p className="mb-5 text-center text-xs font-semibold uppercase tracking-[0.22em] text-[#FF6A00] sm:text-sm">
+          Создание сайтов в Донецке и ДНР
+        </p>
         <h2
           className="mb-16 text-center font-display font-black leading-none tracking-tight text-[#0C0C0C] sm:mb-20 md:mb-28"
           style={{ fontSize: 'clamp(3rem, 12vw, 160px)' }}
@@ -104,8 +107,8 @@ export default function ServicesSection() {
               className="max-w-xl font-normal leading-relaxed text-[#0C0C0C] opacity-70"
               style={{ fontSize: 'clamp(0.95rem, 1.8vw, 1.35rem)' }}
             >
-              Не нашли свою задачу? Расскажите, что нужно, — соберём решение
-              под вас.
+              Нужно сделать сайт в Донецке или запустить более сложный продукт?
+              Расскажите задачу — соберём решение под вас.
             </p>
             <ContactButton variant="dark">Обсудить задачу</ContactButton>
           </div>
