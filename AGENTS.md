@@ -30,5 +30,6 @@
 - Первая загрузка hero — poster-first: на touch видео и WebGL-атлас включаются после первого взаимодействия; не возвращать блокирующий прелоадер, `preload="auto"` или мобильный autoplay.
 - Дизайн-система — [DESIGN.md](DESIGN.md): токены, типографика, графический язык, правило акцента, механика hero-масок. Читать перед любой правкой UI.
 - Прод: https://www.terrikontech.ru (Vercel-проект `terrikontech`). Пуш в `main` запускает `.github/workflows/deploy-vercel.yml`: prebuilt-сборка → Playwright-пререндер → SEO-проверка → production-деплой → IndexNow. Нужны GitHub Actions secrets `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`.
+- Пререндер инлайнит собранные Vite CSS/JS в `index.html`, чтобы первый экран загружался одним ответом; внешний `/assets/` для критического bundle запрещён workflow-проверкой.
 - Ручной fallback с обязательным пререндером: `npx vercel build --prod && python scripts/prerender.py .vercel/output/static && npx vercel deploy --prebuilt --prod`.
   Прямой `npx vercel --prod` соберёт БЕЗ пререндера — SEO-контент из статики пропадёт.
