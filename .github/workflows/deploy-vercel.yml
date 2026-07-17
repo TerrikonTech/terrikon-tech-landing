@@ -60,9 +60,9 @@ jobs:
           html = Path('.vercel/output/static/index.html').read_text(encoding='utf-8');
           assert 'Террикон Тех' in html, 'static H1 is missing';
           assert 'rel=\"canonical\" href=\"https://www.terrikontech.ru/\"' in html, 'canonical is missing';
-          assert 'data-vite-inline=' in html, 'critical assets are not inlined';
-          assert 'src=\"/assets/' not in html, 'external Vite JS is present';
-          assert 'href=\"/assets/' not in html, 'external Vite CSS is present';
+          assert 'src=\"/assets/' in html, 'external Vite JS is missing';
+          assert 'href=\"/assets/' in html, 'external Vite CSS is missing';
+          assert 'data-vite-inline=' not in html, 'Vite assets must stay external';
           assert 'terrikontech.vercel.app' not in html, 'old domain is present'"
 
       - name: Deploy prebuilt output to production
