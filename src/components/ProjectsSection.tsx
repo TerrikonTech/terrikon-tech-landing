@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion, useScroll, useTransform, type MotionValue } from 'framer-motion'
 import FadeIn from './FadeIn'
 import ContactButton from './ContactButton'
@@ -20,6 +20,42 @@ const PROJECTS: Project[] = [
   { number: '04', name: 'Stellar AI', category: 'Клиент', media: MARQUEE_IMAGES[3] },
   { number: '05', name: 'ASME', category: 'Личный', media: MARQUEE_IMAGES[4] },
 ]
+
+function DeferredProjectImage({ src, alt }: { src: string; alt: string }) {
+  const imageRef = useRef<HTMLImageElement>(null)
+  const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    const image = imageRef.current
+    if (!image || !('IntersectionObserver' in window)) {
+      setVisible(true)
+      return
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return
+        setVisible(true)
+        observer.disconnect()
+      },
+      { rootMargin: '300px' },
+    )
+    observer.observe(image)
+    return () => observer.disconnect()
+  }, [])
+
+  return (
+    <img
+      ref={imageRef}
+      src={visible ? src : undefined}
+      alt={alt}
+      loading="lazy"
+      decoding="async"
+      className="w-full rounded-2xl bg-white/5 object-cover"
+      style={{ height: 'clamp(240px, 34vw, 440px)' }}
+    />
+  )
+}
 
 interface ProjectCardProps {
   project: Project
@@ -64,12 +100,9 @@ function ProjectCard({ project, index, totalCards, progress }: ProjectCardProps)
         </div>
 
         <div className="mt-4 sm:mt-6 md:mt-8">
-          <img
+          <DeferredProjectImage
             src={project.media}
             alt={`${project.name} — превью проекта`}
-            loading="lazy"
-            className="w-full rounded-2xl object-cover"
-            style={{ height: 'clamp(240px, 34vw, 440px)' }}
           />
         </div>
       </motion.div>
