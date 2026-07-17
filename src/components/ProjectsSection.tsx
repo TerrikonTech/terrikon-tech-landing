@@ -1,53 +1,77 @@
 import { useEffect, useRef, useState } from 'react'
-import { motion, useScroll, useTransform, type MotionValue } from 'framer-motion'
+import {
+  motion,
+  useMotionValueEvent,
+  useScroll,
+  useTransform,
+  type MotionValue,
+} from 'framer-motion'
 import FadeIn from './FadeIn'
 import ContactButton from './ContactButton'
-import { MARQUEE_IMAGES } from './MarqueeSection'
+import { MARQUEE_IMAGES, MARQUEE_POSTERS } from './MarqueeSection'
 
 interface Project {
   number: string
   name: string
   category: string
   media: string
+  poster: string
 }
 
 // Одна карточка — один живой GIF-превью из секции-марки;
 // названия подобраны под содержимое роликов
 const PROJECTS: Project[] = [
-  { number: '01', name: 'Space Voyage', category: 'Клиент', media: MARQUEE_IMAGES[0] },
-  { number: '02', name: 'CodeNest', category: 'Клиент', media: MARQUEE_IMAGES[1] },
-  { number: '03', name: 'Vex Ventures', category: 'Личный', media: MARQUEE_IMAGES[2] },
-  { number: '04', name: 'Stellar AI', category: 'Клиент', media: MARQUEE_IMAGES[3] },
-  { number: '05', name: 'ASME', category: 'Личный', media: MARQUEE_IMAGES[4] },
+  {
+    number: '01',
+    name: 'Space Voyage',
+    category: 'Клиент',
+    media: MARQUEE_IMAGES[0],
+    poster: MARQUEE_POSTERS[0],
+  },
+  {
+    number: '02',
+    name: 'CodeNest',
+    category: 'Клиент',
+    media: MARQUEE_IMAGES[1],
+    poster: MARQUEE_POSTERS[1],
+  },
+  {
+    number: '03',
+    name: 'Vex Ventures',
+    category: 'Личный',
+    media: MARQUEE_IMAGES[2],
+    poster: MARQUEE_POSTERS[2],
+  },
+  {
+    number: '04',
+    name: 'Stellar AI',
+    category: 'Клиент',
+    media: MARQUEE_IMAGES[3],
+    poster: MARQUEE_POSTERS[3],
+  },
+  {
+    number: '05',
+    name: 'ASME',
+    category: 'Личный',
+    media: MARQUEE_IMAGES[4],
+    poster: MARQUEE_POSTERS[4],
+  },
 ]
 
-function DeferredProjectImage({ src, alt }: { src: string; alt: string }) {
-  const imageRef = useRef<HTMLImageElement>(null)
-  const [visible, setVisible] = useState(false)
-
-  useEffect(() => {
-    const image = imageRef.current
-    if (!image || !('IntersectionObserver' in window)) {
-      setVisible(true)
-      return
-    }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting) return
-        setVisible(true)
-        observer.disconnect()
-      },
-      { rootMargin: '300px' },
-    )
-    observer.observe(image)
-    return () => observer.disconnect()
-  }, [])
-
+function ProjectMedia({
+  src,
+  poster,
+  alt,
+  active,
+}: {
+  src: string
+  poster: string
+  alt: string
+  active: boolean
+}) {
   return (
     <img
-      ref={imageRef}
-      src={visible ? src : undefined}
+      src={active ? src : poster}
       alt={alt}
       loading="lazy"
       decoding="async"
@@ -62,9 +86,16 @@ interface ProjectCardProps {
   index: number
   totalCards: number
   progress: MotionValue<number>
+  active: boolean
 }
 
-function ProjectCard({ project, index, totalCards, progress }: ProjectCardProps) {
+function ProjectCard({
+  project,
+  index,
+  totalCards,
+  progress,
+  active,
+}: ProjectCardProps) {
   const targetScale = 1 - (totalCards - 1 - index) * 0.03
   const scale = useTransform(progress, [index / totalCards, 1], [1, targetScale])
 
@@ -100,9 +131,11 @@ function ProjectCard({ project, index, totalCards, progress }: ProjectCardProps)
         </div>
 
         <div className="mt-4 sm:mt-6 md:mt-8">
-          <DeferredProjectImage
+          <ProjectMedia
             src={project.media}
+            poster={project.poster}
             alt={`${project.name} — превью проекта`}
+            active={active}
           />
         </div>
       </motion.div>
@@ -115,6 +148,30 @@ export default function ProjectsSection() {
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ['start start', 'end end'],
+  })
+  const [sectionNear, setSectionNear] = useState(false)
+  const [activeIndex, setActiveIndex] = useState(0)
+
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container || !('IntersectionObserver' in window)) {
+      setSectionNear(true)
+      return
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => setSectionNear(entry.isIntersecting),
+      { rootMargin: '400px 0px' },
+    )
+    observer.observe(container)
+    return () => observer.disconnect()
+  }, [])
+
+  useMotionValueEvent(scrollYProgress, 'change', (value) => {
+    const next = Math.min(
+      PROJECTS.length - 1,
+      Math.max(0, Math.floor(value * PROJECTS.length)),
+    )
+    setActiveIndex((current) => (current === next ? current : next))
   })
 
   return (
@@ -139,6 +196,7 @@ export default function ProjectsSection() {
             index={index}
             totalCards={PROJECTS.length}
             progress={scrollYProgress}
+            active={sectionNear && activeIndex === index}
           />
         ))}
       </div>
