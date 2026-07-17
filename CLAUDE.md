@@ -14,7 +14,7 @@
 
 ## 🔴 Общие запреты
 - Не коммитим секреты и рантайм-данные: `*token*`, `*secret*`, `*.pem`, `*.key`, БД, живые json-снимки, `node_modules/`, `.venv*/`. Проверяй `.gitignore` перед `git add`, не используй `git add -f` на этих файлах.
-- Прод-сервисы трогаем только с явного подтверждения Олега. Репозиторий ≠ автоматический прод: деплой у проектов ручной (SSH-пуш/скрипты), пуш в репо сам по себе на прод не выезжает.
+- Прод-сервисы трогаем только с явного подтверждения Олега. Автодеплой разрешён только там, где он прямо описан в разделе «Что это / Запуск»; для остальных проектов пуш в репо сам по себе на прод не выезжает.
 
 ## Кто есть кто
 Олег — `KLEFTIS30` (владелец), Савелий — `Savelii777` (владелец, напарник, полные права). Агенты — Claude Code / Codex у обоих.
@@ -27,6 +27,6 @@
 - `npm run build` — прод-сборка (`tsc` + `vite build`) в `dist/`.
 - Скраб-видео — локальные all-intra mp4 в `public/` (не заменять на обычные: развалится плавность сика). Лого — альфа-маска `public/logo-mark.png` + CSS mask (цвета строго #BBCCD7 или чёрный).
 - Дизайн-система — [DESIGN.md](DESIGN.md): токены, типографика, графический язык, правило акцента, механика hero-масок. Читать перед любой правкой UI.
-- Прод: https://www.terrikontech.ru (Vercel-проект terrikontech). Пуш в репо на прод НЕ выезжает — деплой ручной, С ПРЕРЕНДЕРОМ (Яндекс ненадёжно рендерит JS):
-  `npx vercel build --prod && python scripts/prerender.py .vercel/output/static && npx vercel deploy --prebuilt --prod`.
-  Прямой `npx vercel --prod` соберёт БЕЗ пререндера — SEO-контент из статики пропадёт. После деплоя дёрнуть IndexNow (ключ-файл в public/): `curl "https://yandex.com/indexnow?url=https://www.terrikontech.ru/&key=<ключ>"`.
+- Прод: https://www.terrikontech.ru (Vercel-проект `terrikontech`). Пуш в `main` запускает `.github/workflows/deploy-vercel.yml`: prebuilt-сборка → Playwright-пререндер → SEO-проверка → production-деплой → IndexNow. Нужны GitHub Actions secrets `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`.
+- Ручной fallback с обязательным пререндером: `npx vercel build --prod && python scripts/prerender.py .vercel/output/static && npx vercel deploy --prebuilt --prod`.
+  Прямой `npx vercel --prod` соберёт БЕЗ пререндера — SEO-контент из статики пропадёт.
