@@ -2,6 +2,17 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "redirects": [
     {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "terrikontech.vercel.app"
+        }
+      ],
+      "destination": "https://www.terrikontech.ru/",
+      "permanent": true
+    },
+    {
       "source": "/:path*",
       "has": [
         {
@@ -14,6 +25,21 @@
     }
   ],
   "headers": [
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "terrikontech.vercel.app"
+        }
+      ],
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex"
+        }
+      ]
+    },
     {
       "source": "/:path*",
       "has": [
