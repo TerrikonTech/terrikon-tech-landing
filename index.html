@@ -91,12 +91,21 @@
       }
     </script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- Unbounded — дисплейный для заголовков, Golos Text — текстовый; оба с кириллицей -->
+    <!-- Критичные кириллические шрифты локальные: Google Fonts может
+         блокироваться в российских сетях и задерживать DOMContentLoaded. -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;900&family=Golos+Text:wght@400;500;600&display=swap"
-      rel="stylesheet"
+      rel="preload"
+      href="/fonts/unbounded-cyrillic.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/golos-text-cyrillic.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
     />
   </head>
   <body>

@@ -25,6 +25,7 @@
 - `npm install` — зависимости.
 - `npm run dev` — dev-сервер Vite на `http://localhost:5175` (порт зафиксирован в `vite.config.ts`).
 - `npm run build` — прод-сборка (`tsc` + `vite build`) в `dist/`.
+- Шрифты Golos Text и Unbounded хранятся локально в `public/fonts/`; не возвращать блокирующий Google Fonts CSS.
 - Скраб-видео — локальные all-intra mp4 в `public/` (не заменять на обычные: развалится плавность сика). Лого — альфа-маска `public/logo-mark.png` + CSS mask (цвета строго #BBCCD7 или чёрный).
 - Первая загрузка hero — poster-first: на touch видео и WebGL-атлас включаются после первого взаимодействия; не возвращать блокирующий прелоадер, `preload="auto"` или мобильный autoplay.
 - Дизайн-система — [DESIGN.md](DESIGN.md): токены, типографика, графический язык, правило акцента, механика hero-масок. Читать перед любой правкой UI.
