@@ -1,0 +1,72 @@
+name: Deploy production to Vercel
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: terrikontech-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Build, prerender and deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install project dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: |
+          python -m pip install --disable-pip-version-check playwright==1.61.0
+          python -m playwright install --with-deps chromium
+
+      - name: Build Vercel production output
+        run: |
+          npx --yes vercel@56.3.1 pull --yes --environment=production --token="$VERCEL_TOKEN"
+          npx --yes vercel@56.3.1 build --prod --token="$VERCEL_TOKEN"
+
+      - name: Prerender static HTML
+        run: python scripts/prerender.py .vercel/output/static
+
+      - name: Validate prerendered SEO content
+        run: >-
+          python -c "from pathlib import Path;
+          html = Path('.vercel/output/static/index.html').read_text(encoding='utf-8');
+          assert 'Террикон Тех' in html, 'static H1 is missing';
+          assert 'rel=\"canonical\" href=\"https://www.terrikontech.ru/\"' in html, 'canonical is missing';
+          assert 'terrikontech.vercel.app' not in html, 'old domain is present'"
+
+      - name: Deploy prebuilt output to production
+        run: npx --yes vercel@56.3.1 deploy --prebuilt --prod --token="$VERCEL_TOKEN"
+
+      - name: Notify IndexNow
+        continue-on-error: true
+        run: >-
+          curl --fail --silent --show-error --retry 3
+          "https://yandex.com/indexnow?url=https://www.terrikontech.ru/&key=efc23eb942662c260db16f63cc87d54a"
