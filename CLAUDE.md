@@ -20,12 +20,13 @@
 Олег — `KLEFTIS30` (владелец), Савелий — `Savelii777` (владелец, напарник, полные права). Агенты — Claude Code / Codex у обоих.
 
 ## Что это / Запуск
-Русскоязычный лендинг-портфолио «Джек — 3D-художник» (витрина студии Террикон): Vite + React 18 + TypeScript + Tailwind CSS 3.4 + Framer Motion 12, шрифты Unbounded (заголовки, font-display) + Golos Text (текст), акцент #FF6A00 (свитч темы, ::selection, огонёк терриконов). Секции: тетрис-прелоадер, Hero (скраб-видео мышью, 2 темы: манекен/лама, тумблер в навбаре, liquid-glass «Связаться»; на lg фигура перекрывает заголовок: SubjectKeyCanvas — WebGL-кеинг по цвету фона рисует только субъекта поверх текста, слои видео z-0 / текст z-1 / канвас z-2, не ломать порядок), марки из 21 GIF, О нас (посимвольное проявление), Услуги (продакшн-разработка), Проекты (5 sticky-карточек по одному GIF), Команда (Олег+Савелий), гребень терриконов (SVG-горизонт TerrikonRidge), футер Террикон (контакт — только ТГ, контурный водяной знак).
+Русскоязычный лендинг студии разработки «Террикон Тех»: Vite + React 18 + TypeScript + Tailwind CSS 3.4 + Framer Motion 12, шрифты Unbounded (заголовки, font-display) + Golos Text (текст), акцент #FF6A00 (свитч темы, ::selection, огонёк терриконов). Секции: Hero (скраб-видео мышью, 2 темы: манекен/лама, тумблер в навбаре, liquid-glass «Связаться»; на lg фигура перекрывает заголовок: SubjectKeyCanvas — WebGL-кеинг по цвету фона рисует только субъекта поверх текста, слои видео z-0 / текст z-1 / канвас z-2, не ломать порядок), марки из 21 GIF, О нас (посимвольное проявление), Услуги (продакшн-разработка), Проекты (5 sticky-карточек по одному GIF), Команда (Олег+Савелий), гребень терриконов (SVG-горизонт TerrikonRidge), футер Террикон (контакт — только ТГ, контурный водяной знак).
 
 - `npm install` — зависимости.
 - `npm run dev` — dev-сервер Vite на `http://localhost:5175` (порт зафиксирован в `vite.config.ts`).
 - `npm run build` — прод-сборка (`tsc` + `vite build`) в `dist/`.
 - Скраб-видео — локальные all-intra mp4 в `public/` (не заменять на обычные: развалится плавность сика). Лого — альфа-маска `public/logo-mark.png` + CSS mask (цвета строго #BBCCD7 или чёрный).
+- Первая загрузка hero — poster-first: на touch видео и WebGL-атлас включаются после первого взаимодействия; не возвращать блокирующий прелоадер, `preload="auto"` или мобильный autoplay.
 - Дизайн-система — [DESIGN.md](DESIGN.md): токены, типографика, графический язык, правило акцента, механика hero-масок. Читать перед любой правкой UI.
 - Прод: https://www.terrikontech.ru (Vercel-проект `terrikontech`). Пуш в `main` запускает `.github/workflows/deploy-vercel.yml`: prebuilt-сборка → Playwright-пререндер → SEO-проверка → production-деплой → IndexNow. Нужны GitHub Actions secrets `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`.
 - Ручной fallback с обязательным пререндером: `npx vercel build --prod && python scripts/prerender.py .vercel/output/static && npx vercel deploy --prebuilt --prod`.

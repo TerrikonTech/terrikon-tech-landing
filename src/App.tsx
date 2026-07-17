@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { MotionConfig } from 'framer-motion'
-import Preloader from './components/Preloader'
 import HeroSection from './components/HeroSection'
 import MarqueeSection from './components/MarqueeSection'
 import AboutSection from './components/AboutSection'
@@ -28,7 +27,6 @@ export default function App() {
         className="min-h-screen bg-[#0C0C0C] font-sans"
         style={{ overflowX: 'clip' }}
       >
-        <Preloader />
         <HeroSection darkTheme={darkTheme} onToggleTheme={setDarkTheme} />
         <MarqueeSection />
         <AboutSection />

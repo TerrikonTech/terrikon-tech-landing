@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import FadeIn from './FadeIn'
 import ContactButton from './ContactButton'
 import SubjectKeyCanvas from './SubjectKeyCanvas'
 import ThemeSwitch from './ThemeSwitch'
@@ -18,6 +17,8 @@ const NAV_LINKS = [
 // Светлая тема — манекен из mainframe-hero, тёмная — лама из SynapseX.
 const PORTRAIT_VIDEO_LIGHT = '/portrait-scrub.mp4'
 const PORTRAIT_VIDEO_DARK = '/portrait-scrub-dark.mp4'
+const PORTRAIT_POSTER_LIGHT = '/portrait-poster-light.webp'
+const PORTRAIT_POSTER_DARK = '/portrait-poster-dark.webp'
 
 // Логика из mainframe-hero: видео не проигрывается само — кадр мотается
 // только движением мыши. Автоплей остаётся лишь на тач-устройствах,
@@ -30,11 +31,21 @@ function ScrubVideo({ src, dark }: { src: string; dark: boolean }) {
     if (!video) return
 
     if (window.matchMedia('(pointer: coarse)').matches) {
-      video.autoplay = true
+      // На тач-устройствах первый экран рисует лёгкий poster. Тяжёлый
+      // all-intra ролик загружается только после первого взаимодействия,
+      // чтобы не конкурировать с LCP на мобильной сети.
       video.loop = true
-      video.play().catch(() => {})
-      return
+      const startPlayback = () => video.play().catch(() => {})
+      window.addEventListener('pointerdown', startPlayback, {
+        once: true,
+        passive: true,
+      })
+      return () => window.removeEventListener('pointerdown', startPlayback)
     }
+
+    // Десктопу нужны duration и первый кадр для скраббинга, но не весь ролик.
+    video.preload = 'metadata'
+    video.load()
 
     let targetTime = 0
     let prevX: number | null = null
@@ -86,7 +97,8 @@ function ScrubVideo({ src, dark }: { src: string; dark: boolean }) {
           ref={videoRef}
           muted
           playsInline
-          preload="auto"
+          preload="none"
+          poster={dark ? PORTRAIT_POSTER_DARK : PORTRAIT_POSTER_LIGHT}
           src={src}
           aria-label="Террикон Тех — видео-портрет"
           className={`h-full w-full object-cover lg:object-right-top ${
@@ -160,7 +172,7 @@ export default function HeroSection({
       />
 
       <div className="relative flex flex-1 flex-col">
-        <FadeIn delay={0} y={-20} className="relative z-10">
+        <div className="relative z-10">
           <nav className="flex items-center justify-between px-6 pt-6 md:px-10 md:pt-8">
             <a href="#top" aria-label="Наверх">
               <LogoMark
@@ -182,16 +194,16 @@ export default function HeroSection({
               onLightBg={onLightBg}
             />
           </nav>
-        </FadeIn>
+        </div>
 
         <div className="relative z-[1] overflow-hidden">
-          <FadeIn delay={0.15} y={40}>
+          <div>
             <h1
               className={`hero-heading ${onLightBg ? 'hero-heading-on-video' : ''} mt-6 w-full whitespace-nowrap text-center font-display text-[11.2vw] font-black leading-none tracking-tight sm:mt-4 md:-mt-5`}
             >
               Террикон Тех
             </h1>
-          </FadeIn>
+          </div>
         </div>
 
         <AnimatePresence>
@@ -213,7 +225,7 @@ export default function HeroSection({
         </AnimatePresence>
 
         <div className="relative z-10 mt-auto flex items-end justify-between px-6 pb-7 sm:pb-8 md:px-10 md:pb-10">
-          <FadeIn delay={0.35} y={20}>
+          <div>
             <p
               className={`max-w-[180px] font-normal leading-snug sm:max-w-[240px] md:max-w-[280px] ${onLightBg ? 'text-[#0C0C0C]' : 'text-[#D7E2EA]'}`}
               style={{ fontSize: 'clamp(0.75rem, 1.4vw, 1.5rem)' }}
@@ -221,10 +233,10 @@ export default function HeroSection({
               Простые парни, одержимые созданием ярких и незабываемых
               проектов
             </p>
-          </FadeIn>
-          <FadeIn delay={0.5} y={20}>
+          </div>
+          <div>
             <ContactButton variant="glass" onLightBg={onLightBg} />
-          </FadeIn>
+          </div>
         </div>
       </div>
     </section>
