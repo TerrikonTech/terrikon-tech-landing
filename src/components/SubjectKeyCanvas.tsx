@@ -116,26 +116,32 @@ export default function SubjectKeyCanvas({
 
     const start = () => {
       if (cleanupGL) return
-      // preserveDrawingBuffer — чтобы кадр можно было прочитать/отладить.
-      // Контекст один на канвас (повторный getContext вернёт его же), поэтому
-      // в cleanup НЕ вызываем loseContext — StrictMode перемонтирует эффект,
-      // и второй заход получил бы мёртвый контекст.
+
+      // Canvas обновляется только при новом кадре/размере. Постоянная загрузка
+      // 1080p-текстуры в GPU на каждом RAF раньше тормозила даже idle-страницу.
       const gl = canvas.getContext('webgl', {
         premultipliedAlpha: true,
-        preserveDrawingBuffer: true,
+        antialias: false,
+        preserveDrawingBuffer: false,
+        powerPreference: 'high-performance',
       })
       if (!gl || gl.isContextLost()) return
 
+      let disposed = false
       const compile = (type: number, src: string) => {
-        const s = gl.createShader(type)!
-        gl.shaderSource(s, src)
-        gl.compileShader(s)
-        return s
+        const shader = gl.createShader(type)!
+        gl.shaderSource(shader, src)
+        gl.compileShader(shader)
+        return shader
       }
+      const vert = compile(gl.VERTEX_SHADER, VERT)
+      const frag = compile(gl.FRAGMENT_SHADER, FRAG)
       const prog = gl.createProgram()!
-      gl.attachShader(prog, compile(gl.VERTEX_SHADER, VERT))
-      gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, FRAG))
+      gl.attachShader(prog, vert)
+      gl.attachShader(prog, frag)
       gl.linkProgram(prog)
+      gl.deleteShader(vert)
+      gl.deleteShader(frag)
       gl.useProgram(prog)
 
       // Один треугольник на весь экран
@@ -151,33 +157,30 @@ export default function SubjectKeyCanvas({
       gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0)
 
       const setupTex = (unit: number) => {
-        const t = gl.createTexture()
+        const texture = gl.createTexture()
         gl.activeTexture(gl.TEXTURE0 + unit)
-        gl.bindTexture(gl.TEXTURE_2D, t)
+        gl.bindTexture(gl.TEXTURE_2D, texture)
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-        return t
+        return texture
       }
-      // юнит 1 — маска/атлас; до загрузки — 1×1 чёрный (вклад нулевой).
-      // Формат RGB: у атласа тёмной темы два канала (альфа + фон),
-      // grayscale-маска светлой раскладывается в r=g=b
+
+      // Юнит 1 — атлас масок; до загрузки вклад нулевой.
       const maskTex = setupTex(1)
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, 1, 1, 0, gl.RGB,
-        gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0]))
-      const maskImg = new Image()
-      maskImg.onload = () => {
-        if (!cleanupGL) return
-        gl.activeTexture(gl.TEXTURE1)
-        gl.bindTexture(gl.TEXTURE_2D, maskTex)
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB,
-          gl.UNSIGNED_BYTE, maskImg)
-        // вернуть активный юнит: tick заливает кадры видео в юнит 0
-        gl.activeTexture(gl.TEXTURE0)
-      }
-      maskImg.src = MASK_SRC[dark ? 'dark' : 'light']
-      // юнит 0 — кадр видео (активным остаётся он: tick заливает сюда)
+      gl.texImage2D(
+        gl.TEXTURE_2D,
+        0,
+        gl.RGB,
+        1,
+        1,
+        0,
+        gl.RGB,
+        gl.UNSIGNED_BYTE,
+        new Uint8Array([0, 0, 0]),
+      )
+      // Юнит 0 — текущий кадр видео.
       const tex = setupTex(0)
 
       const { key, thresh } = dark ? KEY_DARK : KEY_LIGHT
@@ -190,53 +193,16 @@ export default function SubjectKeyCanvas({
       const uOffset = gl.getUniformLocation(prog, 'uOffset')
       const uFrame = gl.getUniformLocation(prog, 'uFrame')
 
-      // Повторяем object-fit <video> на lg: cover с якорем right-top;
-      // тёмная тема на окнах шире 16/9 — contain по высоте с центровкой
-      // (та же логика, что в className видео — иначе вырезка разъедется)
-      const updateCover = () => {
-        const cw = canvas.clientWidth
-        const ch = canvas.clientHeight
-        const vw = video.videoWidth
-        const vh = video.videoHeight
-        if (!cw || !ch || !vw || !vh) return
-        const dpr = Math.min(window.devicePixelRatio || 1, 1.5)
-        canvas.width = Math.round(cw * dpr)
-        canvas.height = Math.round(ch * dpr)
-        gl.viewport(0, 0, canvas.width, canvas.height)
-        const lg = window.matchMedia('(min-width: 1024px)').matches
-        const contain = dark && lg && cw / ch >= 16 / 9
-        const s = contain
-          ? Math.min(cw / vw, ch / vh)
-          : Math.max(cw / vw, ch / vh)
-        const dw = vw * s
-        const dh = vh * s
-        // якоря кропа = object-position видео: lg — right-top,
-        // мобила — лама center, манекен 68%/50% (иначе вырезка разъедется)
-        const ax = lg ? 1 : dark ? 0.5 : 0.68
-        const ay = lg ? 0 : 0.5
-        gl.uniform2f(uScale, cw / dw, ch / dh)
-        // contain: видео по центру (offset отрицательный — поля по бокам,
-        // шейдер гасит uv вне [0,1]); cover: доля запаса по якорю
-        gl.uniform2f(
-          uOffset,
-          contain ? -(cw - dw) / 2 / dw : ((dw - cw) * ax) / dw,
-          ((dh - ch) * ay) / dh,
-        )
-      }
-      const ro = new ResizeObserver(updateCover)
-      ro.observe(canvas)
-      video.addEventListener('loadedmetadata', updateCover)
-      updateCover()
-
       let rafId = 0
-      const tick = () => {
-        rafId = requestAnimationFrame(tick)
-        if (video.readyState < 2 || !video.videoWidth) return
-        // позиция кадра в атласе масок (тёмная тема)
+      const draw = () => {
+        rafId = 0
+        if (disposed || video.readyState < 2 || !video.videoWidth) return
         gl.uniform1f(
           uFrame,
           (video.currentTime / (video.duration || 1)) * (ATLAS.frames - 1),
         )
+        gl.activeTexture(gl.TEXTURE0)
+        gl.bindTexture(gl.TEXTURE_2D, tex)
         gl.texImage2D(
           gl.TEXTURE_2D,
           0,
@@ -247,12 +213,115 @@ export default function SubjectKeyCanvas({
         )
         gl.drawArrays(gl.TRIANGLES, 0, 3)
       }
-      rafId = requestAnimationFrame(tick)
+      const scheduleDraw = () => {
+        if (!disposed && !rafId) rafId = requestAnimationFrame(draw)
+      }
+
+      const maskImg = new Image()
+      maskImg.onload = () => {
+        if (disposed) return
+        gl.activeTexture(gl.TEXTURE1)
+        gl.bindTexture(gl.TEXTURE_2D, maskTex)
+        gl.texImage2D(
+          gl.TEXTURE_2D,
+          0,
+          gl.RGB,
+          gl.RGB,
+          gl.UNSIGNED_BYTE,
+          maskImg,
+        )
+        gl.activeTexture(gl.TEXTURE0)
+        scheduleDraw()
+      }
+      maskImg.src = MASK_SRC[dark ? 'dark' : 'light']
+
+      // Повторяем object-fit <video>. Canvas не рендерится выше исходных
+      // 1080p: на HiDPI/4K прежний DPR раздувал каждый GPU upload без пользы.
+      const updateCover = () => {
+        const cw = canvas.clientWidth
+        const ch = canvas.clientHeight
+        const vw = video.videoWidth
+        const vh = video.videoHeight
+        if (!cw || !ch || !vw || !vh) return
+
+        const sourceScale = Math.min(vw / cw, vh / ch)
+        const dpr = Math.max(
+          0.25,
+          Math.min(window.devicePixelRatio || 1, 1.25, sourceScale),
+        )
+        const width = Math.round(cw * dpr)
+        const height = Math.round(ch * dpr)
+        if (canvas.width !== width || canvas.height !== height) {
+          canvas.width = width
+          canvas.height = height
+          gl.viewport(0, 0, width, height)
+        }
+
+        const lg = window.matchMedia('(min-width: 1024px)').matches
+        const contain = dark && lg && cw / ch >= 16 / 9
+        const scale = contain
+          ? Math.min(cw / vw, ch / vh)
+          : Math.max(cw / vw, ch / vh)
+        const dw = vw * scale
+        const dh = vh * scale
+        const ax = lg ? 1 : dark ? 0.5 : 0.68
+        const ay = lg ? 0 : 0.5
+        gl.uniform2f(uScale, cw / dw, ch / dh)
+        gl.uniform2f(
+          uOffset,
+          contain ? -(cw - dw) / 2 / dw : ((dw - cw) * ax) / dw,
+          ((dh - ch) * ay) / dh,
+        )
+        scheduleDraw()
+      }
+
+      const ro = new ResizeObserver(updateCover)
+      ro.observe(canvas)
+      video.addEventListener('loadedmetadata', updateCover)
+      video.addEventListener('loadeddata', scheduleDraw)
+      video.addEventListener('seeked', scheduleDraw)
+      video.addEventListener('timeupdate', scheduleDraw)
+      updateCover()
+
+      // На touch видео играет: requestVideoFrameCallback даёт ровно один
+      // WebGL draw на реально декодированный кадр. На десктопе достаточно
+      // события seeked — в покое canvas не потребляет CPU/GPU.
+      let videoFrameId: number | null = null
+      const onVideoFrame = () => {
+        videoFrameId = null
+        scheduleDraw()
+        if (!video.paused && !video.ended) startVideoFrames()
+      }
+      const startVideoFrames = () => {
+        if (
+          videoFrameId === null &&
+          'requestVideoFrameCallback' in video &&
+          !video.paused
+        ) {
+          videoFrameId = video.requestVideoFrameCallback(onVideoFrame)
+        }
+      }
+      const stopVideoFrames = () => {
+        if (videoFrameId !== null && 'cancelVideoFrameCallback' in video) {
+          video.cancelVideoFrameCallback(videoFrameId)
+          videoFrameId = null
+        }
+      }
+      video.addEventListener('play', startVideoFrames)
+      video.addEventListener('pause', stopVideoFrames)
+      startVideoFrames()
 
       cleanupGL = () => {
-        cancelAnimationFrame(rafId)
+        disposed = true
+        if (rafId) cancelAnimationFrame(rafId)
+        stopVideoFrames()
         ro.disconnect()
         video.removeEventListener('loadedmetadata', updateCover)
+        video.removeEventListener('loadeddata', scheduleDraw)
+        video.removeEventListener('seeked', scheduleDraw)
+        video.removeEventListener('timeupdate', scheduleDraw)
+        video.removeEventListener('play', startVideoFrames)
+        video.removeEventListener('pause', stopVideoFrames)
         maskImg.onload = null
         gl.deleteProgram(prog)
         gl.deleteTexture(tex)
@@ -261,9 +330,8 @@ export default function SubjectKeyCanvas({
       }
     }
 
-    // На тач-устройствах первый экран остаётся лёгким: poster виден сразу,
-    // а WebGL, атлас маски и покадровый цикл включаются вместе с видео
-    // после первого взаимодействия. На десктопе скраб доступен сразу.
+    // На тач-устройствах poster остаётся первым экраном, а WebGL включается
+    // только после пользовательского запуска видео.
     const coarsePointer = window.matchMedia('(pointer: coarse)').matches
     if (coarsePointer) {
       video.addEventListener('playing', start, { once: true })

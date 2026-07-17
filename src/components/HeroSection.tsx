@@ -47,17 +47,30 @@ function ScrubVideo({ src, dark }: { src: string; dark: boolean }) {
     video.preload = 'metadata'
     video.load()
 
-    let targetTime = 0
+    let targetTime = video.currentTime || 0
     let prevX: number | null = null
     let seeking = false
     let rafId = 0
 
-    const onSeeked = () => {
-      seeking = false
+    // Сик планируется только когда мышь действительно изменила целевой кадр.
+    // Раньше пустой RAF-цикл работал 60 раз/с всё время жизни страницы.
+    const queueSeek = () => {
+      if (rafId || seeking || !video.duration) return
+      rafId = requestAnimationFrame(() => {
+        rafId = 0
+        if (seeking || !video.duration) return
+        if (Math.abs(targetTime - video.currentTime) < 1 / 30) return
+        seeking = true
+        video.currentTime = targetTime
+      })
     }
 
-    // mousemove только копит целевое время; сам сик — максимум раз в кадр
-    // и только когда предыдущий завершился, иначе очередь сиков душит декодер
+    const onSeeked = () => {
+      seeking = false
+      // Пока браузер декодировал кадр, мышь могла уйти дальше.
+      queueSeek()
+    }
+
     const onMouseMove = (e: MouseEvent) => {
       if (prevX === null) {
         prevX = e.clientX
@@ -68,23 +81,15 @@ function ScrubVideo({ src, dark }: { src: string; dark: boolean }) {
       if (!video.duration) return
       const next = targetTime + (delta / window.innerWidth) * 0.8 * video.duration
       targetTime = Math.min(Math.max(next, 0), video.duration)
-    }
-
-    const tick = () => {
-      rafId = requestAnimationFrame(tick)
-      if (seeking || !video.duration) return
-      if (Math.abs(targetTime - video.currentTime) < 1 / 30) return
-      seeking = true
-      video.currentTime = targetTime
+      queueSeek()
     }
 
     window.addEventListener('mousemove', onMouseMove, { passive: true })
     video.addEventListener('seeked', onSeeked)
-    rafId = requestAnimationFrame(tick)
     return () => {
       window.removeEventListener('mousemove', onMouseMove)
       video.removeEventListener('seeked', onSeeked)
-      cancelAnimationFrame(rafId)
+      if (rafId) cancelAnimationFrame(rafId)
     }
   }, [])
 

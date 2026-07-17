@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type RefObject } from 'react'
 
 export const MARQUEE_IMAGES = [
   'https://motionsites.ai/assets/hero-space-voyage-preview-eECLH3Yc.gif',
@@ -24,8 +24,12 @@ export const MARQUEE_IMAGES = [
   'https://motionsites.ai/assets/hero-celestia-preview-0yO3jXO8.gif',
 ]
 
-const ROW_1 = MARQUEE_IMAGES.slice(0, 11)
-const ROW_2 = MARQUEE_IMAGES.slice(11)
+export const MARQUEE_POSTERS = MARQUEE_IMAGES.map(
+  (_, index) => `/marquee/${String(index + 1).padStart(2, '0')}.webp`,
+)
+
+const ROW_1 = MARQUEE_POSTERS.slice(0, 11)
+const ROW_2 = MARQUEE_POSTERS.slice(11)
 
 function DeferredMarqueeImage({ src }: { src: string }) {
   const imageRef = useRef<HTMLImageElement>(null)
@@ -39,12 +43,8 @@ function DeferredMarqueeImage({ src }: { src: string }) {
     }
 
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting) return
-        setVisible(true)
-        observer.disconnect()
-      },
-      { rootMargin: '200px' },
+      ([entry]) => setVisible(entry.isIntersecting),
+      { rootMargin: '160px' },
     )
     observer.observe(image)
     return () => observer.disconnect()
@@ -65,18 +65,18 @@ function DeferredMarqueeImage({ src }: { src: string }) {
 
 interface MarqueeRowProps {
   images: string[]
-  transform: string
+  rowRef: RefObject<HTMLDivElement>
 }
 
-function MarqueeRow({ images, transform }: MarqueeRowProps) {
-  const tripled = [...images, ...images, ...images]
+function MarqueeRow({ images, rowRef }: MarqueeRowProps) {
   return (
     <div
+      ref={rowRef}
       className="flex justify-center gap-3"
-      style={{ transform, willChange: 'transform' }}
+      style={{ transform: 'translate3d(0, 0, 0)', willChange: 'transform' }}
     >
-      {tripled.map((src, i) => (
-        <DeferredMarqueeImage key={i} src={src} />
+      {images.map((src) => (
+        <DeferredMarqueeImage key={src} src={src} />
       ))}
     </div>
   )
@@ -84,19 +84,40 @@ function MarqueeRow({ images, transform }: MarqueeRowProps) {
 
 export default function MarqueeSection() {
   const sectionRef = useRef<HTMLElement>(null)
-  const [offset, setOffset] = useState(0)
+  const row1Ref = useRef<HTMLDivElement>(null)
+  const row2Ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    // параллакс — чистая декорация: при «уменьшить движение» ленты статичны
+    // Не обновляем React-дерево из 20+ GIF на каждый scroll event:
+    // браузеру достаточно одного transform в ближайшем animation frame.
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    const handleScroll = () => {
-      if (!sectionRef.current) return
-      const sectionTop = sectionRef.current.offsetTop
-      setOffset((window.scrollY - sectionTop + window.innerHeight) * 0.3)
+    let rafId = 0
+    const update = () => {
+      rafId = 0
+      const section = sectionRef.current
+      const row1 = row1Ref.current
+      const row2 = row2Ref.current
+      if (!section || !row1 || !row2) return
+      const rect = section.getBoundingClientRect()
+      if (rect.bottom < -window.innerHeight || rect.top > window.innerHeight * 2) {
+        return
+      }
+      const offset =
+        (window.scrollY - section.offsetTop + window.innerHeight) * 0.3 - 200
+      row1.style.transform = `translate3d(${offset}px, 0, 0)`
+      row2.style.transform = `translate3d(${-offset}px, 0, 0)`
     }
-    handleScroll()
+    const handleScroll = () => {
+      if (!rafId) rafId = requestAnimationFrame(update)
+    }
+    update()
     window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
+    window.addEventListener('resize', handleScroll, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('resize', handleScroll)
+      if (rafId) cancelAnimationFrame(rafId)
+    }
   }, [])
 
   return (
@@ -105,11 +126,8 @@ export default function MarqueeSection() {
       // растворение у краёв вьюпорта: ленты не обрываются жёстким срезом
       className="flex flex-col gap-3 bg-[#0C0C0C] pb-10 pt-24 [-webkit-mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)] [mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)] sm:pt-32 md:pt-40"
     >
-      <MarqueeRow images={ROW_1} transform={`translateX(${offset - 200}px)`} />
-      <MarqueeRow
-        images={ROW_2}
-        transform={`translateX(${-(offset - 200)}px)`}
-      />
+      <MarqueeRow images={ROW_1} rowRef={row1Ref} />
+      <MarqueeRow images={ROW_2} rowRef={row2Ref} />
     </section>
   )
 }
