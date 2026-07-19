@@ -1,83 +1,74 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef } from 'react'
 import {
   motion,
-  useMotionValueEvent,
   useScroll,
   useTransform,
   type MotionValue,
 } from 'framer-motion'
 import FadeIn from './FadeIn'
 import ContactButton from './ContactButton'
-import { MARQUEE_IMAGES, MARQUEE_POSTERS } from './MarqueeSection'
+import { MARQUEE_POSTERS } from './MarqueeSection'
 
 interface Project {
   number: string
   name: string
   category: string
-  media: string
   poster: string
 }
 
-// Одна карточка — один живой GIF-превью из секции-марки;
-// названия подобраны под содержимое роликов
+// Владелец подтвердил текущий состав и порядок проектов. Карточки не
+// подменяем другими продуктами и не расширяем неподтверждёнными фактами.
 const PROJECTS: Project[] = [
   {
     number: '01',
     name: 'Space Voyage',
     category: 'Клиент',
-    media: MARQUEE_IMAGES[0],
     poster: MARQUEE_POSTERS[0],
   },
   {
     number: '02',
     name: 'CodeNest',
     category: 'Клиент',
-    media: MARQUEE_IMAGES[1],
     poster: MARQUEE_POSTERS[1],
   },
   {
     number: '03',
     name: 'Vex Ventures',
     category: 'Личный',
-    media: MARQUEE_IMAGES[2],
     poster: MARQUEE_POSTERS[2],
   },
   {
     number: '04',
     name: 'Stellar AI',
     category: 'Клиент',
-    media: MARQUEE_IMAGES[3],
     poster: MARQUEE_POSTERS[3],
   },
   {
     number: '05',
     name: 'ASME',
     category: 'Личный',
-    media: MARQUEE_IMAGES[4],
     poster: MARQUEE_POSTERS[4],
   },
 ]
 
-function ProjectMedia({
-  src,
-  poster,
-  alt,
-  active,
-}: {
-  src: string
-  poster: string
-  alt: string
-  active: boolean
-}) {
+function ProjectMedia({ poster, alt }: { poster: string; alt: string }) {
   return (
-    <img
-      src={active ? src : poster}
-      alt={alt}
-      loading="lazy"
-      decoding="async"
-      className="w-full rounded-2xl bg-white/5 object-cover"
-      style={{ height: 'clamp(240px, 34vw, 440px)' }}
-    />
+    <div className="group/media relative overflow-hidden rounded-2xl bg-white/5">
+      <motion.img
+        src={poster}
+        alt={alt}
+        loading="lazy"
+        decoding="async"
+        whileHover={{ scale: 1.025 }}
+        transition={{ duration: 0.45, ease: [0.25, 0.1, 0.25, 1] }}
+        className="w-full object-cover"
+        style={{ height: 'clamp(240px, 34vw, 440px)' }}
+      />
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/10 transition-colors duration-300 group-hover/media:ring-white/25"
+      />
+    </div>
   )
 }
 
@@ -86,7 +77,6 @@ interface ProjectCardProps {
   index: number
   totalCards: number
   progress: MotionValue<number>
-  active: boolean
 }
 
 function ProjectCard({
@@ -94,19 +84,17 @@ function ProjectCard({
   index,
   totalCards,
   progress,
-  active,
 }: ProjectCardProps) {
   const targetScale = 1 - (totalCards - 1 - index) * 0.03
   const scale = useTransform(progress, [index / totalCards, 1], [1, targetScale])
 
   return (
-    // min-h вместо жёсткой высоты: на низких/широких окнах карточка выше
-    // 85vh и вылезала из слота, накрывая CTA после секции; marginTop
-    // вместо top — чтобы смещение стопки учитывалось в высоте слота
     <div className="sticky top-24 min-h-[85vh] md:top-32">
-      <motion.div
+      <motion.article
         className="relative rounded-[20px] border-2 border-[#D7E2EA] bg-[#0C0C0C] p-4 sm:rounded-[24px] sm:p-6 md:rounded-[28px] md:p-8"
         style={{ scale, marginTop: `${index * 28}px` }}
+        whileHover={{ y: -4 }}
+        transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
       >
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-4 sm:gap-6 md:gap-8">
@@ -132,13 +120,11 @@ function ProjectCard({
 
         <div className="mt-4 sm:mt-6 md:mt-8">
           <ProjectMedia
-            src={project.media}
             poster={project.poster}
             alt={`${project.name} — превью проекта`}
-            active={active}
           />
         </div>
-      </motion.div>
+      </motion.article>
     </div>
   )
 }
@@ -148,30 +134,6 @@ export default function ProjectsSection() {
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ['start start', 'end end'],
-  })
-  const [sectionNear, setSectionNear] = useState(false)
-  const [activeIndex, setActiveIndex] = useState(0)
-
-  useEffect(() => {
-    const container = containerRef.current
-    if (!container || !('IntersectionObserver' in window)) {
-      setSectionNear(true)
-      return
-    }
-    const observer = new IntersectionObserver(
-      ([entry]) => setSectionNear(entry.isIntersecting),
-      { rootMargin: '400px 0px' },
-    )
-    observer.observe(container)
-    return () => observer.disconnect()
-  }, [])
-
-  useMotionValueEvent(scrollYProgress, 'change', (value) => {
-    const next = Math.min(
-      PROJECTS.length - 1,
-      Math.max(0, Math.floor(value * PROJECTS.length)),
-    )
-    setActiveIndex((current) => (current === next ? current : next))
   })
 
   return (
@@ -196,13 +158,10 @@ export default function ProjectsSection() {
             index={index}
             totalCards={PROJECTS.length}
             progress={scrollYProgress}
-            active={sectionNear && activeIndex === index}
           />
         ))}
       </div>
 
-      {/* CTA сразу после кейсов — пик намерения; relative z-10 — sticky-
-          карточки позиционированы и иначе красятся поверх статичного текста */}
       <FadeIn delay={0.1}>
         <div className="relative z-10 flex flex-col items-center gap-6 pt-24 text-center sm:pt-32">
           <p

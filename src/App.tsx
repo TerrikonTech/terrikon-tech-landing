@@ -4,7 +4,9 @@ import HeroSection from './components/HeroSection'
 import MarqueeSection from './components/MarqueeSection'
 import AboutSection from './components/AboutSection'
 import ServicesSection from './components/ServicesSection'
+import ProcessSection from './components/ProcessSection'
 import ProjectsSection from './components/ProjectsSection'
+import FAQSection from './components/FAQSection'
 import TeamSection from './components/TeamSection'
 import TerrikonRidge from './components/TerrikonRidge'
 import Footer from './components/Footer'
@@ -31,7 +33,9 @@ export default function App() {
         <MarqueeSection />
         <AboutSection />
         <ServicesSection />
+        <ProcessSection />
         <ProjectsSection />
+        <FAQSection />
         <TeamSection />
         <TerrikonRidge />
         <Footer />

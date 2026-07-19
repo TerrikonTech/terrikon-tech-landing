@@ -111,6 +111,9 @@ export default function SubjectKeyCanvas({
     const canvas = canvasRef.current
     const video = videoRef.current
     if (!canvas || !video) return
+    // При reduced motion остаётся poster: не создаём WebGL-контекст и не
+    // загружаем покадровый атлас маски.
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
     let cleanupGL: (() => void) | null = null
 
