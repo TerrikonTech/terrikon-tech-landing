@@ -55,15 +55,7 @@ jobs:
         run: python scripts/prerender.py .vercel/output/static
 
       - name: Validate prerendered SEO content
-        run: >-
-          python -c "from pathlib import Path;
-          html = Path('.vercel/output/static/index.html').read_text(encoding='utf-8');
-          assert 'Террикон Тех' in html, 'static H1 is missing';
-          assert 'rel=\"canonical\" href=\"https://www.terrikontech.ru/\"' in html, 'canonical is missing';
-          assert 'src=\"/assets/' in html, 'external Vite JS is missing';
-          assert 'href=\"/assets/' in html, 'external Vite CSS is missing';
-          assert 'data-vite-inline=' not in html, 'Vite assets must stay external';
-          assert 'terrikontech.vercel.app' not in html, 'old domain is present'"
+        run: python scripts/validate_build.py .vercel/output/static
 
       - name: Deploy prebuilt output to production
         run: npx --yes vercel@56.3.1 deploy --prebuilt --prod --token="$VERCEL_TOKEN"

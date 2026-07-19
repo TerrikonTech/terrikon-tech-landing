@@ -30,6 +30,18 @@ function ScrubVideo({ src, dark }: { src: string; dark: boolean }) {
     const video = videoRef.current
     if (!video) return
 
+    // Reduced motion и Save-Data оставляют постер единственным кадром: без
+    // загрузки metadata, autoplay и слушателя скраббинга.
+    const connection = (
+      navigator as Navigator & { connection?: { saveData?: boolean } }
+    ).connection
+    if (
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+      connection?.saveData
+    ) {
+      return
+    }
+
     if (window.matchMedia('(pointer: coarse)').matches) {
       // На тач-устройствах первый экран рисует лёгкий poster. Тяжёлый
       // all-intra ролик загружается только после первого взаимодействия,

@@ -1,82 +1,67 @@
-import { useEffect, useRef, useState, type RefObject } from 'react'
+import { useEffect, useRef, type RefObject } from 'react'
 
-export const MARQUEE_IMAGES = [
-  'https://motionsites.ai/assets/hero-space-voyage-preview-eECLH3Yc.gif',
-  'https://motionsites.ai/assets/hero-codenest-preview-Cgppc2qV.gif',
-  'https://motionsites.ai/assets/hero-vex-ventures-preview-BczMFIiw.gif',
-  'https://motionsites.ai/assets/hero-stellar-ai-v2-preview-DjvxjG3C.gif',
-  'https://motionsites.ai/assets/hero-asme-preview-B_nGDnTP.gif',
-  'https://motionsites.ai/assets/hero-transform-data-preview-Cx5OU29N.gif',
-  'https://motionsites.ai/assets/hero-vitara-preview-Cjz2QYyU.gif',
-  'https://motionsites.ai/assets/hero-terra-preview-BFjrCr7T.gif',
-  'https://motionsites.ai/assets/hero-skyelite-preview-DHaZIgUv.gif',
-  'https://motionsites.ai/assets/hero-aethera-preview-DknSlcTa.gif',
-  'https://motionsites.ai/assets/hero-designpro-preview-D8c5_een.gif',
-  'https://motionsites.ai/assets/hero-stellar-ai-preview-D3HL6bw1.gif',
-  'https://motionsites.ai/assets/hero-xportfolio-preview-D4A8maiC.gif',
-  'https://motionsites.ai/assets/hero-orbit-web3-preview-BXt4OttD.gif',
-  'https://motionsites.ai/assets/hero-nexora-preview-cx5HmUgo.gif',
-  'https://motionsites.ai/assets/hero-evr-ventures-preview-DZxeVFEX.gif',
-  'https://motionsites.ai/assets/hero-planet-orbit-preview-DWAP8Z1P.gif',
-  'https://motionsites.ai/assets/hero-new-era-preview-CocuDUm9.gif',
-  'https://motionsites.ai/assets/hero-wealth-preview-B70idl_u.gif',
-  'https://motionsites.ai/assets/hero-luminex-preview-CxOP7ce6.gif',
-  'https://motionsites.ai/assets/hero-celestia-preview-0yO3jXO8.gif',
+const ROW_1 = [
+  'Сайты',
+  'Веб-сервисы',
+  'Приложения',
+  'Telegram Mini Apps',
+  'Карты',
+  'Realtime',
 ]
 
-export const MARQUEE_POSTERS = MARQUEE_IMAGES.map(
-  (_, index) => `/marquee/${String(index + 1).padStart(2, '0')}.webp`,
-)
-
-const ROW_1 = MARQUEE_POSTERS.slice(0, 11)
-const ROW_2 = MARQUEE_POSTERS.slice(11)
-
-function DeferredMarqueeImage({ src }: { src: string }) {
-  const imageRef = useRef<HTMLImageElement>(null)
-  const [visible, setVisible] = useState(false)
-
-  useEffect(() => {
-    const image = imageRef.current
-    if (!image || !('IntersectionObserver' in window)) {
-      setVisible(true)
-      return
-    }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => setVisible(entry.isIntersecting),
-      { rootMargin: '160px' },
-    )
-    observer.observe(image)
-    return () => observer.disconnect()
-  }, [])
-
-  return (
-    <img
-      ref={imageRef}
-      src={visible ? src : undefined}
-      alt=""
-      loading="lazy"
-      decoding="async"
-      className="rounded-2xl bg-white/5 object-cover"
-      style={{ width: 420, height: 270, flexShrink: 0 }}
-    />
-  )
-}
+const ROW_2 = [
+  'Продуктовый дизайн',
+  'Автоматизация',
+  'Интеграции',
+  '3D и WebGL',
+  'Аналитика',
+  'Поддержка',
+]
 
 interface MarqueeRowProps {
-  images: string[]
+  items: string[]
   rowRef: RefObject<HTMLDivElement>
+  outlined?: boolean
+  initialOffset: string
 }
 
-function MarqueeRow({ images, rowRef }: MarqueeRowProps) {
+function MarqueeRow({
+  items,
+  rowRef,
+  outlined = false,
+  initialOffset,
+}: MarqueeRowProps) {
+  const repeatedItems = [...items, ...items]
+
   return (
     <div
       ref={rowRef}
-      className="flex justify-center gap-3"
-      style={{ transform: 'translate3d(0, 0, 0)', willChange: 'transform' }}
+      aria-hidden="true"
+      className="flex w-max items-center gap-5 px-[6vw] sm:gap-8"
+      style={{
+        transform: `translate3d(${initialOffset}, 0, 0)`,
+        willChange: 'transform',
+      }}
     >
-      {images.map((src) => (
-        <DeferredMarqueeImage key={src} src={src} />
+      {repeatedItems.map((item, index) => (
+        <div
+          key={`${item}-${index}`}
+          className="flex shrink-0 items-center gap-5 sm:gap-8"
+        >
+          <span
+            className="whitespace-nowrap font-display font-black uppercase leading-none tracking-[-0.05em]"
+            style={{
+              fontSize: 'clamp(2.5rem, 7vw, 7.5rem)',
+              color: outlined ? 'transparent' : '#D7E2EA',
+              WebkitTextStroke: outlined
+                ? '1px rgba(215, 226, 234, 0.58)'
+                : undefined,
+            }}
+          >
+            {item}
+          </span>
+          <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-[#FF6A00] sm:h-3 sm:w-3" />
+        </div>
       ))}
     </div>
   )
@@ -88,9 +73,8 @@ export default function MarqueeSection() {
   const row2Ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    // Не обновляем React-дерево из 20+ GIF на каждый scroll event:
-    // браузеру достаточно одного transform в ближайшем animation frame.
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
     let rafId = 0
     const update = () => {
       rafId = 0
@@ -98,24 +82,33 @@ export default function MarqueeSection() {
       const row1 = row1Ref.current
       const row2 = row2Ref.current
       if (!section || !row1 || !row2) return
+
       const rect = section.getBoundingClientRect()
       if (rect.bottom < -window.innerHeight || rect.top > window.innerHeight * 2) {
         return
       }
-      const offset =
-        (window.scrollY - section.offsetTop + window.innerHeight) * 0.3 - 200
-      row1.style.transform = `translate3d(${offset}px, 0, 0)`
-      row2.style.transform = `translate3d(${-offset}px, 0, 0)`
+
+      const progress = Math.min(
+        Math.max((window.innerHeight - rect.top) / (window.innerHeight + rect.height), 0),
+        1,
+      )
+      const travel = Math.min(window.innerWidth * 0.14, 180)
+
+      row1.style.transform = `translate3d(${-travel + progress * travel}px, 0, 0)`
+      row2.style.transform = `translate3d(${-travel * 0.35 - progress * travel}px, 0, 0)`
     }
-    const handleScroll = () => {
+
+    const handleViewportChange = () => {
       if (!rafId) rafId = requestAnimationFrame(update)
     }
+
     update()
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    window.addEventListener('resize', handleScroll, { passive: true })
+    window.addEventListener('scroll', handleViewportChange, { passive: true })
+    window.addEventListener('resize', handleViewportChange, { passive: true })
+
     return () => {
-      window.removeEventListener('scroll', handleScroll)
-      window.removeEventListener('resize', handleScroll)
+      window.removeEventListener('scroll', handleViewportChange)
+      window.removeEventListener('resize', handleViewportChange)
       if (rafId) cancelAnimationFrame(rafId)
     }
   }, [])
@@ -123,11 +116,22 @@ export default function MarqueeSection() {
   return (
     <section
       ref={sectionRef}
-      // растворение у краёв вьюпорта: ленты не обрываются жёстким срезом
-      className="flex flex-col gap-3 bg-[#0C0C0C] pb-10 pt-24 [-webkit-mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)] [mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)] sm:pt-32 md:pt-40"
+      aria-label="Направления разработки"
+      className="overflow-hidden bg-[#0C0C0C] pb-12 pt-24 sm:pb-16 sm:pt-32 md:pt-40"
     >
-      <MarqueeRow images={ROW_1} rowRef={row1Ref} />
-      <MarqueeRow images={ROW_2} rowRef={row2Ref} />
+      <div className="flex flex-col gap-4 sm:gap-6">
+        <MarqueeRow
+          items={ROW_1}
+          rowRef={row1Ref}
+          initialOffset="-12vw"
+        />
+        <MarqueeRow
+          items={ROW_2}
+          rowRef={row2Ref}
+          outlined
+          initialOffset="-5vw"
+        />
+      </div>
     </section>
   )
 }

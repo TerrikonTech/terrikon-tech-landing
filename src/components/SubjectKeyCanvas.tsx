@@ -111,6 +111,17 @@ export default function SubjectKeyCanvas({
     const canvas = canvasRef.current
     const video = videoRef.current
     if (!canvas || !video) return
+    // При reduced motion или Save-Data остаётся poster: не создаём
+    // WebGL-контекст и не загружаем покадровый атлас маски.
+    const connection = (
+      navigator as Navigator & { connection?: { saveData?: boolean } }
+    ).connection
+    if (
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+      connection?.saveData
+    ) {
+      return
+    }
 
     let cleanupGL: (() => void) | null = null
 

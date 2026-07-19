@@ -1,83 +1,89 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef } from 'react'
 import {
   motion,
-  useMotionValueEvent,
+  useReducedMotion,
   useScroll,
   useTransform,
   type MotionValue,
 } from 'framer-motion'
+import { ArrowUpRight } from 'lucide-react'
 import FadeIn from './FadeIn'
 import ContactButton from './ContactButton'
-import { MARQUEE_IMAGES, MARQUEE_POSTERS } from './MarqueeSection'
 
 interface Project {
   number: string
   name: string
   category: string
-  media: string
+  description: string
+  url: string
   poster: string
+  alt: string
+  tags: string[]
+  mediaClassName: string
 }
 
-// Одна карточка — один живой GIF-превью из секции-марки;
-// названия подобраны под содержимое роликов
 const PROJECTS: Project[] = [
   {
     number: '01',
-    name: 'Space Voyage',
-    category: 'Клиент',
-    media: MARQUEE_IMAGES[0],
-    poster: MARQUEE_POSTERS[0],
+    name: 'GasTracker',
+    category: 'Городской сервис',
+    description:
+      'Карта наличия топлива в Донецке и ДНР с фильтрами, отметками пользователей и уведомлениями.',
+    url: 'https://www.gastracker.ru/',
+    poster: '/projects/gastracker.jpg',
+    alt: 'Интерфейс карты GasTracker для Донецка и ДНР',
+    tags: ['Карта', 'Realtime', 'PWA'],
+    mediaClassName: 'w-[155%] object-left',
   },
   {
     number: '02',
-    name: 'CodeNest',
-    category: 'Клиент',
-    media: MARQUEE_IMAGES[1],
-    poster: MARQUEE_POSTERS[1],
-  },
-  {
-    number: '03',
-    name: 'Vex Ventures',
-    category: 'Личный',
-    media: MARQUEE_IMAGES[2],
-    poster: MARQUEE_POSTERS[2],
-  },
-  {
-    number: '04',
-    name: 'Stellar AI',
-    category: 'Клиент',
-    media: MARQUEE_IMAGES[3],
-    poster: MARQUEE_POSTERS[3],
-  },
-  {
-    number: '05',
-    name: 'ASME',
-    category: 'Личный',
-    media: MARQUEE_IMAGES[4],
-    poster: MARQUEE_POSTERS[4],
+    name: 'Купеческие Яства',
+    category: 'Сайт + Telegram',
+    description:
+      'Витрина мясной лавки с каталогом, оформлением заказа и связанным Telegram-ботом.',
+    url: 'https://meat-donetsk.ru/',
+    poster: '/projects/kupecheskie-yastva.jpg',
+    alt: 'Главная страница сайта Купеческие Яства',
+    tags: ['Витрина', 'Каталог', 'Telegram'],
+    mediaClassName: 'w-full object-center',
   },
 ]
 
 function ProjectMedia({
-  src,
-  poster,
-  alt,
-  active,
+  project,
+  reduceMotion,
 }: {
-  src: string
-  poster: string
-  alt: string
-  active: boolean
+  project: Project
+  reduceMotion: boolean
 }) {
   return (
-    <img
-      src={active ? src : poster}
-      alt={alt}
-      loading="lazy"
-      decoding="async"
-      className="w-full rounded-2xl bg-white/5 object-cover"
-      style={{ height: 'clamp(240px, 34vw, 440px)' }}
-    />
+    <a
+      href={project.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={`Открыть проект ${project.name}`}
+      className="group/media relative block min-h-[320px] overflow-hidden rounded-2xl bg-white/5 outline-none focus-visible:ring-2 focus-visible:ring-[#FF6A00] focus-visible:ring-offset-4 focus-visible:ring-offset-[#0C0C0C] sm:min-h-[420px] lg:min-h-[560px]"
+    >
+      <motion.div
+        className="absolute inset-0 origin-left"
+        whileHover={reduceMotion ? undefined : { scale: 1.025 }}
+        transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+      >
+        <img
+          src={project.poster}
+          alt={project.alt}
+          loading="lazy"
+          decoding="async"
+          className={`absolute inset-y-0 left-0 h-full max-w-none object-cover ${project.mediaClassName}`}
+        />
+      </motion.div>
+
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/10" />
+      <span className="absolute right-4 top-4 flex items-center gap-2 rounded-full border border-white/20 bg-black/55 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-white backdrop-blur-md transition-colors duration-300 group-hover/media:border-white/45 sm:right-5 sm:top-5">
+        Смотреть
+        <ArrowUpRight aria-hidden="true" className="h-4 w-4" />
+      </span>
+    </a>
   )
 }
 
@@ -86,7 +92,6 @@ interface ProjectCardProps {
   index: number
   totalCards: number
   progress: MotionValue<number>
-  active: boolean
 }
 
 function ProjectCard({
@@ -94,51 +99,77 @@ function ProjectCard({
   index,
   totalCards,
   progress,
-  active,
 }: ProjectCardProps) {
+  const reduceMotion = useReducedMotion() ?? false
   const targetScale = 1 - (totalCards - 1 - index) * 0.03
   const scale = useTransform(progress, [index / totalCards, 1], [1, targetScale])
 
   return (
-    // min-h вместо жёсткой высоты: на низких/широких окнах карточка выше
-    // 85vh и вылезала из слота, накрывая CTA после секции; marginTop
-    // вместо top — чтобы смещение стопки учитывалось в высоте слота
-    <div className="sticky top-24 min-h-[85vh] md:top-32">
-      <motion.div
-        className="relative rounded-[20px] border-2 border-[#D7E2EA] bg-[#0C0C0C] p-4 sm:rounded-[24px] sm:p-6 md:rounded-[28px] md:p-8"
-        style={{ scale, marginTop: `${index * 28}px` }}
+    <div className="relative mb-8 md:sticky md:top-24 md:min-h-[88vh] md:mb-0">
+      <motion.article
+        className="relative rounded-[24px] border border-[#D7E2EA]/45 bg-[#111214] p-4 shadow-[0_30px_90px_rgba(0,0,0,0.28)] sm:p-6 md:rounded-[32px] md:p-8"
+        style={{
+          scale: reduceMotion ? 1 : scale,
+          marginTop: `${index * 24}px`,
+          transformOrigin: 'top center',
+        }}
+        whileHover={reduceMotion ? undefined : { y: -4 }}
+        transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
       >
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-4 sm:gap-6 md:gap-8">
-            <span
-              className="font-display font-black leading-none text-[#D7E2EA]"
-              style={{ fontSize: 'clamp(2.6rem, 8.5vw, 120px)' }}
-            >
-              {project.number}
-            </span>
-            <div className="flex flex-col">
-              <span className="text-xs font-normal uppercase tracking-widest text-[#D7E2EA] opacity-60 sm:text-sm">
-                {project.category}
-              </span>
+        <div className="grid gap-8 lg:grid-cols-[0.72fr_1.28fr] lg:gap-10">
+          <div className="flex min-h-[320px] flex-col justify-between py-1 sm:min-h-[360px] lg:min-h-0 lg:py-3">
+            <div>
+              <div className="flex items-center justify-between gap-5">
+                <span
+                  className="font-display font-black leading-none text-[#D7E2EA]"
+                  style={{ fontSize: 'clamp(2.8rem, 6vw, 5.5rem)' }}
+                >
+                  {project.number}
+                </span>
+                <span className="text-right text-xs font-semibold uppercase tracking-[0.18em] text-[#FF6A00] sm:text-sm">
+                  {project.category}
+                </span>
+              </div>
+
               <h3
-                className="font-display font-semibold text-[#D7E2EA]"
-                style={{ fontSize: 'clamp(1.1rem, 2.2vw, 1.9rem)' }}
+                className="mt-10 font-display font-bold leading-[1.02] text-[#D7E2EA]"
+                style={{ fontSize: 'clamp(1.8rem, 3.4vw, 3.5rem)' }}
               >
                 {project.name}
               </h3>
-            </div>
-          </div>
-        </div>
+              <p className="mt-6 max-w-md text-base leading-relaxed text-[#D7E2EA]/70 sm:text-lg">
+                {project.description}
+              </p>
 
-        <div className="mt-4 sm:mt-6 md:mt-8">
-          <ProjectMedia
-            src={project.media}
-            poster={project.poster}
-            alt={`${project.name} — превью проекта`}
-            active={active}
-          />
+              <ul className="mt-8 flex flex-wrap gap-2" aria-label="Особенности проекта">
+                {project.tags.map((tag) => (
+                  <li
+                    key={tag}
+                    className="rounded-full border border-[#D7E2EA]/20 px-3 py-1.5 text-xs font-medium uppercase tracking-[0.12em] text-[#D7E2EA]/70"
+                  >
+                    {tag}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <a
+              href={project.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group/link mt-12 inline-flex w-fit items-center gap-3 font-semibold text-[#D7E2EA] outline-none transition-colors hover:text-[#FF6A00] focus-visible:ring-2 focus-visible:ring-[#FF6A00] focus-visible:ring-offset-4 focus-visible:ring-offset-[#111214]"
+            >
+              Открыть живой проект
+              <ArrowUpRight
+                aria-hidden="true"
+                className="h-5 w-5 transition-transform duration-300 group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5"
+              />
+            </a>
+          </div>
+
+          <ProjectMedia project={project} reduceMotion={reduceMotion} />
         </div>
-      </motion.div>
+      </motion.article>
     </div>
   )
 }
@@ -149,30 +180,6 @@ export default function ProjectsSection() {
     target: containerRef,
     offset: ['start start', 'end end'],
   })
-  const [sectionNear, setSectionNear] = useState(false)
-  const [activeIndex, setActiveIndex] = useState(0)
-
-  useEffect(() => {
-    const container = containerRef.current
-    if (!container || !('IntersectionObserver' in window)) {
-      setSectionNear(true)
-      return
-    }
-    const observer = new IntersectionObserver(
-      ([entry]) => setSectionNear(entry.isIntersecting),
-      { rootMargin: '400px 0px' },
-    )
-    observer.observe(container)
-    return () => observer.disconnect()
-  }, [])
-
-  useMotionValueEvent(scrollYProgress, 'change', (value) => {
-    const next = Math.min(
-      PROJECTS.length - 1,
-      Math.max(0, Math.floor(value * PROJECTS.length)),
-    )
-    setActiveIndex((current) => (current === next ? current : next))
-  })
 
   return (
     <section
@@ -180,12 +187,22 @@ export default function ProjectsSection() {
       className="relative z-10 -mt-10 rounded-t-[40px] bg-[#0C0C0C] px-5 pb-20 pt-20 sm:-mt-12 sm:rounded-t-[50px] sm:px-8 sm:pt-24 md:-mt-14 md:rounded-t-[60px] md:px-10 md:pt-32"
     >
       <FadeIn y={40}>
-        <h2
-          className="hero-heading mb-16 text-center font-display font-black leading-none tracking-tight sm:mb-20 md:mb-28"
-          style={{ fontSize: 'clamp(3rem, 12vw, 160px)' }}
-        >
-          Проекты
-        </h2>
+        <div className="mx-auto mb-16 flex max-w-6xl flex-col gap-7 sm:mb-20 md:mb-28 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="mb-5 text-xs font-semibold uppercase tracking-[0.22em] text-[#FF6A00] sm:text-sm">
+              Работает прямо сейчас
+            </p>
+            <h2
+              className="hero-heading font-display font-black leading-none tracking-tight"
+              style={{ fontSize: 'clamp(3rem, 11vw, 150px)' }}
+            >
+              Проекты
+            </h2>
+          </div>
+          <p className="max-w-md pb-2 leading-relaxed text-[#D7E2EA]/70 md:text-lg">
+            Не мокапы: два продукта команды, которые можно открыть и проверить.
+          </p>
+        </div>
       </FadeIn>
 
       <div ref={containerRef} className="mx-auto max-w-6xl">
@@ -196,20 +213,17 @@ export default function ProjectsSection() {
             index={index}
             totalCards={PROJECTS.length}
             progress={scrollYProgress}
-            active={sectionNear && activeIndex === index}
           />
         ))}
       </div>
 
-      {/* CTA сразу после кейсов — пик намерения; relative z-10 — sticky-
-          карточки позиционированы и иначе красятся поверх статичного текста */}
       <FadeIn delay={0.1}>
-        <div className="relative z-10 flex flex-col items-center gap-6 pt-24 text-center sm:pt-32">
+        <div className="relative z-10 flex flex-col items-center gap-6 pt-20 text-center sm:pt-28">
           <p
             className="max-w-xl font-normal leading-relaxed text-[#D7E2EA]/70"
             style={{ fontSize: 'clamp(0.95rem, 1.8vw, 1.35rem)' }}
           >
-            Хотите так же? Напишите — обсудим ваш проект и предложим план.
+            Есть задача? Покажем релевантные работы и предложим план запуска.
           </p>
           <ContactButton>Написать в Telegram</ContactButton>
         </div>
