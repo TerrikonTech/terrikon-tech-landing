@@ -35,6 +35,17 @@ production_text = "\n".join(
     path.read_text(encoding="utf-8", errors="ignore") for path in text_assets
 )
 assert "motionsites.ai" not in production_text, "external project media is present"
+for placeholder in ("Space Voyage", "CodeNest", "Vex Ventures", "Stellar AI", "ASME"):
+    assert placeholder not in production_text, f"placeholder project is present: {placeholder}"
+
+project_media = {
+    "GasTracker": STATIC_DIR / "projects" / "gastracker.jpg",
+    "Купеческие Яства": STATIC_DIR / "projects" / "kupecheskie-yastva.jpg",
+}
+for project_name, media_path in project_media.items():
+    assert project_name in html, f"project is missing from prerender: {project_name}"
+    assert media_path.is_file(), f"project media is missing: {media_path}"
+assert not (STATIC_DIR / "marquee").exists(), "legacy marquee media was copied"
 
 json_ld_blocks = re.findall(
     r'<script[^>]+type="application/ld\+json"[^>]*>(.*?)</script>',
@@ -70,6 +81,24 @@ assert organization, "Organization JSON-LD is missing"
 offers = organization["hasOfferCatalog"]["itemListElement"]
 assert len(offers) == 5, f"expected 5 services in OfferCatalog, got {len(offers)}"
 
+projects = next(
+    (
+        item
+        for item in graph
+        if isinstance(item, dict)
+        and item.get("@type") == "ItemList"
+        and item.get("@id") == "https://www.terrikontech.ru/#projects"
+    ),
+    None,
+)
+assert projects, "project ItemList JSON-LD is missing"
+project_items = projects["itemListElement"]
+assert len(project_items) == 2, "expected 2 real projects"
+assert [entry["item"]["name"] for entry in project_items] == [
+    "GasTracker",
+    "Купеческие Яства",
+], "project ItemList does not match visible cards"
+
 faq = next(
     (
         item
@@ -83,5 +112,6 @@ assert len(faq["mainEntity"]) == 6, "expected 6 FAQ questions"
 
 print(
     f"validated {INDEX}: {len(text_assets)} text assets, "
-    f"{len(offers)} services, {len(faq['mainEntity'])} FAQ items"
+    f"{len(offers)} services, {len(project_items)} projects, "
+    f"{len(faq['mainEntity'])} FAQ items"
 )
