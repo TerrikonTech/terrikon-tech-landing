@@ -4,7 +4,7 @@ import { Moon, Sun } from 'lucide-react'
 interface ThemeSwitchProps {
   checked: boolean
   onChange: (checked: boolean) => void
-  /** true — свитч лежит на светлом фоне видео (lg, светлая тема) */
+  /** true — свитч лежит на светлом фоне hero */
   onLightBg: boolean
 }
 

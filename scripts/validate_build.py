@@ -35,17 +35,31 @@ production_text = "\n".join(
     path.read_text(encoding="utf-8", errors="ignore") for path in text_assets
 )
 assert "motionsites.ai" not in production_text, "external project media is present"
-for placeholder in ("Space Voyage", "CodeNest", "Vex Ventures", "Stellar AI", "ASME"):
-    assert placeholder not in production_text, f"placeholder project is present: {placeholder}"
 
-project_media = {
-    "GasTracker": STATIC_DIR / "projects" / "gastracker.jpg",
-    "Купеческие Яства": STATIC_DIR / "projects" / "kupecheskie-yastva.jpg",
-}
-for project_name, media_path in project_media.items():
+project_names = [
+    "Space Voyage",
+    "CodeNest",
+    "Vex Ventures",
+    "Stellar AI",
+    "ASME",
+]
+for index, project_name in enumerate(project_names, start=1):
+    media_path = STATIC_DIR / "marquee" / f"{index:02d}.webp"
     assert project_name in html, f"project is missing from prerender: {project_name}"
     assert media_path.is_file(), f"project media is missing: {media_path}"
-assert not (STATIC_DIR / "marquee").exists(), "legacy marquee media was copied"
+assert not (STATIC_DIR / "projects").exists(), "replaced project media was copied"
+
+hero_assets = [
+    STATIC_DIR / "subject-light-frames.webp",
+    STATIC_DIR / "subject-dark-frames.webp",
+    STATIC_DIR / "subject-light-poster.webp",
+    STATIC_DIR / "subject-dark-poster.webp",
+]
+for media_path in hero_assets:
+    assert media_path.is_file(), f"baked hero asset is missing: {media_path}"
+assert ".mp4" not in production_text, "runtime video scrub is still referenced"
+assert not list(STATIC_DIR.glob("portrait-scrub*.mp4")), "source hero video was copied"
+assert not list(STATIC_DIR.glob("subject-mask-*.png")), "runtime key masks were copied"
 
 json_ld_blocks = re.findall(
     r'<script[^>]+type="application/ld\+json"[^>]*>(.*?)</script>',
@@ -93,11 +107,10 @@ projects = next(
 )
 assert projects, "project ItemList JSON-LD is missing"
 project_items = projects["itemListElement"]
-assert len(project_items) == 2, "expected 2 real projects"
-assert [entry["item"]["name"] for entry in project_items] == [
-    "GasTracker",
-    "Купеческие Яства",
-], "project ItemList does not match visible cards"
+assert len(project_items) == 5, "expected 5 projects"
+assert [entry["item"]["name"] for entry in project_items] == project_names, (
+    "project ItemList does not match visible cards"
+)
 
 faq = next(
     (
