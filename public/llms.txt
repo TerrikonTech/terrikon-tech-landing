@@ -1,0 +1,18 @@
+# Террикон Тех
+
+> Студия цифровых продуктов из Донецка. Создаёт сайты, веб-сервисы, Telegram Mini Apps и автоматизацию для компаний в ДНР, новых регионах и по всей России.
+
+## Основные страницы
+
+- [Главная](https://www.terrikontech.ru/): студия, услуги, процесс, проекты, команда и контакты.
+- [Создание сайтов в Донецке](https://www.terrikontech.ru/sozdanie-saitov-donetsk/): сайты и лендинги под ключ.
+- [Разработка сайтов в ДНР](https://www.terrikontech.ru/razrabotka-saitov-dnr/): цифровые проекты для компаний региона.
+- [Разработка веб-сервисов](https://www.terrikontech.ru/razrabotka-veb-servisov/): личные кабинеты, панели и API.
+- [Telegram Mini Apps](https://www.terrikontech.ru/telegram-mini-apps/): приложения и боты внутри Telegram.
+- [Автоматизация бизнеса](https://www.terrikontech.ru/avtomatizatsiya-biznesa/): интеграции, кабинеты, CRM и API.
+- [Регионы работы](https://www.terrikontech.ru/regiony-raboty/): ДНР, новые регионы и Россия.
+
+## Контакт
+
+- Telegram: https://t.me/Zotov_O
+- GitHub: https://github.com/TerrikonTech
