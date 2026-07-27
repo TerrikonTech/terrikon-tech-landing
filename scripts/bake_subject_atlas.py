@@ -32,9 +32,19 @@ async ({ videoUrl, maskUrl, mode, frames, cols, rows, tileWidth, tileHeight,
   video.muted = true;
   video.playsInline = true;
   video.preload = 'auto';
-  video.src = videoUrl;
+  const videoResponse = await fetch(videoUrl);
+  if (!videoResponse.ok) {
+    throw new Error(`Failed to load video: ${videoResponse.status}`);
+  }
+  // Bake from a fully buffered Blob. SimpleHTTPRequestHandler does not provide
+  // reliable byte-range seeking, so drawing immediately after seeked could keep
+  // the first decoded frame while the mask advanced through the atlas.
+  video.src = URL.createObjectURL(await videoResponse.blob());
   document.body.appendChild(video);
   await waitFor(video, 'loadedmetadata');
+  if (video.readyState < 2) {
+    await waitFor(video, 'loadeddata');
+  }
 
   const seek = async (time) => {
     const safeTime = Math.min(Math.max(time, 0), Math.max(video.duration - 0.002, 0));
