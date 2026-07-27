@@ -14,8 +14,8 @@ const ATLAS = {
   frames: 40,
   cols: 8,
   rows: 5,
-  tileWidth: 512,
-  tileHeight: 288,
+  tileWidth: 960,
+  tileHeight: 540,
 }
 
 interface SubjectKeyCanvasProps {
@@ -75,8 +75,8 @@ export default function SubjectKeyCanvas({ dark }: SubjectKeyCanvasProps) {
       const clientHeight = canvas.clientHeight
       if (!clientWidth || !clientHeight) return
 
-      // Ограничиваем backing store: 512×288 кадр не выигрывает от 2×/3× DPR,
-      // а один drawImage на pointer frame остаётся дешёвым даже на 4K-мониторе.
+      // Атлас хранит кадры 960×540: этого достаточно для чёткого hero на
+      // desktop, а backing store по-прежнему ограничен исходным разрешением.
       const sourceScale = Math.min(
         ATLAS.tileWidth / clientWidth,
         ATLAS.tileHeight / clientHeight,

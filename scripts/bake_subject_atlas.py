@@ -274,11 +274,11 @@ def main() -> None:
         choices=("light", "dark", "all"),
         default="all",
     )
-    parser.add_argument("--tile-width", type=int, default=512)
-    parser.add_argument("--tile-height", type=int, default=288)
+    parser.add_argument("--tile-width", type=int, default=960)
+    parser.add_argument("--tile-height", type=int, default=540)
     parser.add_argument("--poster-width", type=int, default=960)
     parser.add_argument("--poster-height", type=int, default=540)
-    parser.add_argument("--quality", type=float, default=0.82)
+    parser.add_argument("--quality", type=float, default=0.86)
     args = parser.parse_args()
 
     project_dir = Path(__file__).resolve().parent.parent

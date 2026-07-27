@@ -53,9 +53,11 @@ function MarqueeRow({
             style={{
               fontSize: 'clamp(2.5rem, 7vw, 7.5rem)',
               color: outlined ? 'transparent' : '#D7E2EA',
-              WebkitTextStroke: outlined
-                ? '1px rgba(215, 226, 234, 0.58)'
+              backgroundImage: outlined
+                ? 'linear-gradient(180deg, rgba(187,204,215,0.20) 0%, rgba(187,204,215,0.03) 85%)'
                 : undefined,
+              WebkitBackgroundClip: outlined ? 'text' : undefined,
+              backgroundClip: outlined ? 'text' : undefined,
             }}
           >
             {item}
