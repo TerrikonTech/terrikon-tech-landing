@@ -13,7 +13,7 @@
       "permanent": true
     },
     {
-      "source": "/:path*",
+      "source": "/:path((?!yandex_8f67f8eaafce6326\\.html$).*)",
       "has": [
         {
           "type": "host",
