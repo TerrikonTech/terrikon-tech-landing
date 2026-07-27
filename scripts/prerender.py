@@ -1,62 +1,91 @@
 # -*- coding: utf-8 -*-
-"""Пререндер главной для SEO: Яндекс рендерит JS ненадёжно (бета) и сам
-рекомендует пререндер (https://yandex.ru/support/webmaster/ru/yandex-indexing/rendering).
-Скрипт поднимает статический сервер над собранной папкой, открывает главную
-в headless-браузере, ждёт прогрузки приложения и вписывает отрендеренный DOM
-обратно в index.html. React при загрузке перерисовывает #root — для пользователя
-ничего не меняется, а робот получает весь контент без выполнения JS.
+"""Пререндерит главную и SEO-страницы в самостоятельные статические HTML.
 
-Использование: python scripts/prerender.py <папка сборки>
-(dist или .vercel/output/static). Требует playwright (python).
+Использование: python scripts/prerender.py <каталог сборки>
+(обычно dist или .vercel/output/static). Требуется playwright (python).
 """
+from __future__ import annotations
+
 import http.server
 import io
 import os
+import shutil
 import socketserver
 import sys
 import threading
+from pathlib import Path
 
 from playwright.sync_api import sync_playwright
 
-OUT = sys.argv[1] if len(sys.argv) > 1 else "dist"
+OUT = Path(sys.argv[1] if len(sys.argv) > 1 else "dist").resolve()
 PORT = 4517
+ROUTES = [
+    "/",
+    "/sozdanie-saitov-donetsk/",
+    "/razrabotka-saitov-dnr/",
+    "/razrabotka-veb-servisov/",
+    "/telegram-mini-apps/",
+    "/avtomatizatsiya-biznesa/",
+    "/regiony-raboty/",
+]
 
-if not os.path.exists(os.path.join(OUT, "index.html")):
-    sys.exit(f"нет {OUT}/index.html — сначала сборка")
+root_index = OUT / "index.html"
+if not root_index.is_file():
+    sys.exit(f"Нет {root_index} — сначала выполните сборку")
+
+# Чистые URL должны существовать до запуска локального HTTP-сервера.
+# React увидит pathname и отрисует соответствующую страницу, после чего
+# результат заменит временную копию шаблона.
+template = root_index.read_text(encoding="utf-8")
+for route in ROUTES[1:]:
+    target = OUT / route.strip("/") / "index.html"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(template, encoding="utf-8", newline="\n")
+
+class QuietHandler(http.server.SimpleHTTPRequestHandler):
+    def log_message(self, _format: str, *args: object) -> None:
+        return
 
 os.chdir(OUT)
 httpd = socketserver.TCPServer(
     ("127.0.0.1", PORT),
-    lambda *a, **kw: http.server.SimpleHTTPRequestHandler(*a, directory=".", **kw),
+    lambda *args, **kwargs: QuietHandler(*args, directory=".", **kwargs),
 )
-threading.Thread(target=httpd.serve_forever, daemon=True).start()
+thread = threading.Thread(target=httpd.serve_forever, daemon=True)
+thread.start()
 
-with sync_playwright() as p:
-    browser = p.chromium.launch()
-    page = browser.new_page(viewport={"width": 1440, "height": 900})
-    page.goto(f"http://127.0.0.1:{PORT}/", wait_until="domcontentloaded")
-    page.wait_for_selector("h1")
-    page.wait_for_timeout(1000)
-    # Лёгкое движение мыши гасит скраб-хинт, чтобы он не попал в снапшот.
-    page.mouse.move(10, 10)
-    page.mouse.move(12, 10)
-    page.wait_for_timeout(300)
-    # Десктопный пререндер включает metadata для скраббинга. Перед снапшотом
-    # возвращаем preload=none, иначе мобильный браузер начнёт MP4 ещё до React.
-    page.eval_on_selector_all(
-        "video",
-        "videos => videos.forEach(video => { video.pause(); video.preload = 'none' })",
-    )
-    html = page.evaluate("document.documentElement.outerHTML")
-    browser.close()
-httpd.shutdown()
+try:
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        for route in ROUTES:
+            page = browser.new_page(viewport={"width": 1440, "height": 900})
+            page.goto(
+                f"http://127.0.0.1:{PORT}{route}",
+                wait_until="domcontentloaded",
+            )
+            page.wait_for_selector("h1")
+            page.wait_for_timeout(500)
 
-out_path = os.path.join(".", "index.html")
-with io.open(out_path, "w", encoding="utf-8", newline="\n") as output_file:
-    output_file.write("<!doctype html>\n" + html)
+            if route == "/":
+                # Убираем подсказку scrub из статического снимка.
+                page.mouse.move(10, 10)
+                page.mouse.move(12, 10)
+                page.wait_for_timeout(200)
 
-size = os.path.getsize(out_path)
-has_h1 = "Террикон Тех" in html
-print(f"prerendered: {out_path} ({size} bytes), h1 в статике: {has_h1}")
-if not has_h1:
-    sys.exit("контент не отрендерился — снапшот без заголовка")
+            html = page.evaluate("document.documentElement.outerHTML")
+            page.close()
+
+            target = root_index if route == "/" else OUT / route.strip("/") / "index.html"
+            with io.open(target, "w", encoding="utf-8", newline="\n") as output_file:
+                output_file.write("<!doctype html>\n" + html)
+
+            size = target.stat().st_size
+            print(f"prerendered: {route} -> {target} ({size} bytes)")
+        browser.close()
+finally:
+    httpd.shutdown()
+    httpd.server_close()
+    thread.join(timeout=5)
+
+if "Террикон Тех" not in root_index.read_text(encoding="utf-8"):
+    sys.exit("Контент главной не попал в статический HTML")

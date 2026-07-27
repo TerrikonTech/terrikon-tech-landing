@@ -19,6 +19,17 @@ const NAV_COLUMNS = [
       { label: 'Наверх', href: '#top' },
     ],
   },
+  {
+    title: 'Разработка',
+    links: [
+      { label: 'Сайты в Донецке', href: '/sozdanie-saitov-donetsk/' },
+      { label: 'Сайты в ДНР', href: '/razrabotka-saitov-dnr/' },
+      { label: 'Веб-сервисы', href: '/razrabotka-veb-servisov/' },
+      { label: 'Telegram Mini Apps', href: '/telegram-mini-apps/' },
+      { label: 'Автоматизация', href: '/avtomatizatsiya-biznesa/' },
+      { label: 'Регионы работы', href: '/regiony-raboty/' },
+    ],
+  },
 ]
 
 export default function Footer() {
@@ -27,7 +38,7 @@ export default function Footer() {
       id="contact"
       className="relative overflow-hidden bg-[#0C0C0C] px-6 pt-20 sm:px-10 md:px-16"
     >
-      <div className="relative z-10 mx-auto grid max-w-6xl grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="relative z-10 mx-auto grid max-w-6xl grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-5">
         {/* Лого + описание */}
         <div className="lg:col-span-2">
           <div className="flex items-center gap-2.5">
@@ -63,12 +74,17 @@ export default function Footer() {
         {/* Контакты — единственное целевое действие, поэтому кнопка, не строчка */}
         <div>
           <h3 className="text-base font-semibold text-white">Контакты</h3>
+          <address className="mt-5 text-sm not-italic leading-relaxed text-[#D7E2EA]/60">
+            Донецк, ДНР
+            <br />
+            Работаем по всей России
+          </address>
           {/* Белая плоская кнопка, как CTA на тёмных секциях */}
           <a
             href={TELEGRAM_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-5 inline-flex items-center gap-2.5 rounded-full bg-white px-6 py-3 text-sm font-semibold text-[#0C0C0C] shadow-[0_6px_20px_-8px_rgba(0,0,0,0.55)] transition-[transform,box-shadow] duration-300 hover:scale-[1.04] hover:shadow-[0_10px_28px_-8px_rgba(0,0,0,0.45)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#FF6A00] active:scale-[0.97]"
+            className="mt-4 inline-flex items-center gap-2.5 rounded-full bg-white px-6 py-3 text-sm font-semibold text-[#0C0C0C] shadow-[0_6px_20px_-8px_rgba(0,0,0,0.55)] transition-[transform,box-shadow] duration-300 hover:scale-[1.04] hover:shadow-[0_10px_28px_-8px_rgba(0,0,0,0.45)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#FF6A00] active:scale-[0.97]"
           >
             <Send className="h-4 w-4" />
             Написать в Telegram

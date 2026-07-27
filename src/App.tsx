@@ -10,8 +10,10 @@ import FAQSection from './components/FAQSection'
 import TeamSection from './components/TeamSection'
 import TerrikonRidge from './components/TerrikonRidge'
 import Footer from './components/Footer'
+import SeoLandingPage from './components/SeoLandingPage'
+import { normalizePath, SEO_PAGE_BY_PATH } from './seoPages'
 
-export default function App() {
+function HomePage() {
   // Тёмная — дефолт: светлая только если выбрана явно
   const [darkTheme, setDarkTheme] = useState(
     () => localStorage.getItem('jack-theme') !== 'light',
@@ -42,4 +44,9 @@ export default function App() {
       </main>
     </MotionConfig>
   )
+}
+
+export default function App() {
+  const page = SEO_PAGE_BY_PATH.get(normalizePath(window.location.pathname))
+  return page ? <SeoLandingPage page={page} /> : <HomePage />
 }

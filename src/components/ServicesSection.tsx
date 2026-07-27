@@ -4,30 +4,35 @@ import ContactButton from './ContactButton'
 const SERVICES = [
   {
     number: '01',
+    href: '/sozdanie-saitov-donetsk/',
     name: 'Сайты и лендинги под ключ',
     description:
       'Создание сайтов и лендингов под ключ: дизайн, вёрстка, анимации, деплой и аналитика — за считанные дни.',
   },
   {
     number: '02',
+    href: '/razrabotka-veb-servisov/',
     name: 'Фулстек-разработка',
     description:
       'Полный цикл: фронтенд, бэкенд, базы данных, API и интеграции. Одна команда ведёт проект от архитектуры до релиза.',
   },
   {
     number: '03',
+    href: '/telegram-mini-apps/',
     name: 'Приложения',
     description:
       'Веб- и мобильные приложения: PWA, Telegram Mini Apps, личные кабинеты — быстрые, живучие в офлайне, с уведомлениями.',
   },
   {
     number: '04',
+    href: '/razrabotka-veb-servisov/',
     name: 'Платформы и сервисы',
     description:
       'Нагруженные онлайн-платформы: карты и реалтайм, админки, платежи, аналитика. Масштабируются вместе с вашим бизнесом.',
   },
   {
     number: '05',
+    href: '/avtomatizatsiya-biznesa/',
     name: 'Программное обеспечение',
     description:
       'Софт под задачу: автоматизация, боты, парсеры, интеграции с железом и внешними API. Поддержка и развитие после запуска.',
@@ -88,7 +93,9 @@ export default function ServicesSection() {
                 className="font-display font-semibold text-[#0C0C0C] transition-transform duration-300 ease-out group-hover:translate-x-5"
                 style={{ fontSize: 'clamp(1.35rem, 2.8vw, 2.5rem)' }}
               >
-                {service.name}
+                <a href={service.href} className="outline-none focus-visible:ring-2 focus-visible:ring-[#FF6A00]">
+                  {service.name}
+                </a>
               </h3>
               <p
                 className="max-w-2xl font-normal leading-relaxed text-[#0C0C0C] opacity-60 transition-all duration-300 ease-out group-hover:translate-x-5 group-hover:opacity-80"

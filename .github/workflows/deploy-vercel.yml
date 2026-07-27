@@ -62,6 +62,4 @@ jobs:
 
       - name: Notify IndexNow
         continue-on-error: true
-        run: >-
-          curl --fail --silent --show-error --retry 3
-          "https://yandex.com/indexnow?url=https://www.terrikontech.ru/&key=efc23eb942662c260db16f63cc87d54a"
+        run: python scripts/submit_indexnow.py

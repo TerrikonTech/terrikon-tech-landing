@@ -8,10 +8,18 @@
       name="description"
       content="Создаём сайты под ключ, веб-сервисы, приложения и Telegram Mini Apps в Донецке и ДНР. Дизайн, разработка, запуск и поддержка — Террикон Тех."
     />
+    <meta
+      name="keywords"
+      content="создание сайтов Донецк, разработка сайтов ДНР, сайт под ключ, веб-студия Донецк, веб-сервисы, Telegram Mini Apps, автоматизация бизнеса"
+    />
+    <meta name="author" content="Террикон Тех" />
+    <meta name="geo.placename" content="Донецк" />
     <meta name="theme-color" content="#0C0C0C" />
     <!-- OG-теги статические — боты мессенджеров не исполняют JS.
          Прод: Vercel, основной домен — www.terrikontech.ru. -->
     <link rel="canonical" href="https://www.terrikontech.ru/" />
+    <link id="alternate-ru" rel="alternate" hreflang="ru-RU" href="https://www.terrikontech.ru/" />
+    <link id="alternate-default" rel="alternate" hreflang="x-default" href="https://www.terrikontech.ru/" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Террикон Тех" />
     <meta property="og:url" content="https://www.terrikontech.ru/" />
@@ -44,12 +52,12 @@
       content="Сайты под ключ, веб-сервисы, приложения и Telegram Mini Apps для бизнеса в Донецке, ДНР и по всей России."
     />
     <meta name="twitter:image" content="https://www.terrikontech.ru/og.jpg" />
-    <meta name="robots" content="index, follow" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
     <!-- Верификация кабинетов: вставить коды после регистрации.
          Яндекс.Вебмастер: <meta name="yandex-verification" content="..." />
          Google Search Console: <meta name="google-site-verification" content="..." /> -->
     <!-- Структурированные данные: студия как организация с услугами -->
-    <script type="application/ld+json">
+    <script id="site-jsonld" type="application/ld+json">
       {
         "@context": "https://schema.org",
         "@graph": [
@@ -61,6 +69,20 @@
             "alternateName": ["Террикон", "TerrikonTech"],
             "inLanguage": "ru-RU",
             "publisher": {
+              "@id": "https://www.terrikontech.ru/#organization"
+            }
+          },
+          {
+            "@type": "WebPage",
+            "@id": "https://www.terrikontech.ru/#webpage",
+            "url": "https://www.terrikontech.ru/",
+            "name": "Создание сайтов в Донецке и ДНР — Террикон Тех",
+            "description": "Создаём сайты под ключ, веб-сервисы, приложения и Telegram Mini Apps в Донецке и ДНР.",
+            "inLanguage": "ru-RU",
+            "isPartOf": {
+              "@id": "https://www.terrikontech.ru/#website"
+            },
+            "about": {
               "@id": "https://www.terrikontech.ru/#organization"
             }
           },
@@ -106,6 +128,7 @@
                   "itemOffered": {
                     "@type": "Service",
                     "name": "Сайты и лендинги под ключ",
+                    "url": "https://www.terrikontech.ru/sozdanie-saitov-donetsk/",
                     "areaServed": "Донецк, ДНР и Россия"
                   }
                 },
@@ -114,6 +137,7 @@
                   "itemOffered": {
                     "@type": "Service",
                     "name": "Фулстек-разработка",
+                    "url": "https://www.terrikontech.ru/razrabotka-veb-servisov/",
                     "areaServed": "Донецк, ДНР и Россия"
                   }
                 },
@@ -122,6 +146,7 @@
                   "itemOffered": {
                     "@type": "Service",
                     "name": "Веб- и мобильные приложения",
+                    "url": "https://www.terrikontech.ru/telegram-mini-apps/",
                     "areaServed": "Донецк, ДНР и Россия"
                   }
                 },
@@ -130,6 +155,7 @@
                   "itemOffered": {
                     "@type": "Service",
                     "name": "Платформы и сервисы",
+                    "url": "https://www.terrikontech.ru/razrabotka-veb-servisov/",
                     "areaServed": "Донецк, ДНР и Россия"
                   }
                 },
@@ -138,6 +164,7 @@
                   "itemOffered": {
                     "@type": "Service",
                     "name": "Программное обеспечение",
+                    "url": "https://www.terrikontech.ru/avtomatizatsiya-biznesa/",
                     "areaServed": "Донецк, ДНР и Россия"
                   }
                 }
