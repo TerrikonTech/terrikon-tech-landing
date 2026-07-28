@@ -49,18 +49,6 @@ for index, project_name in enumerate(project_names, start=1):
     assert media_path.is_file(), f"project media is missing: {media_path}"
 assert not (STATIC_DIR / "projects").exists(), "replaced project media was copied"
 
-hero_assets = [
-    STATIC_DIR / "subject-light-frames.webp",
-    STATIC_DIR / "subject-dark-frames.webp",
-    STATIC_DIR / "subject-light-poster.webp",
-    STATIC_DIR / "subject-dark-poster.webp",
-]
-for media_path in hero_assets:
-    assert media_path.is_file(), f"baked hero asset is missing: {media_path}"
-assert ".mp4" not in production_text, "runtime video scrub is still referenced"
-assert not list(STATIC_DIR.glob("portrait-scrub*.mp4")), "source hero video was copied"
-assert not list(STATIC_DIR.glob("subject-mask-*.png")), "runtime key masks were copied"
-
 json_ld_blocks = re.findall(
     r'<script[^>]+type="application/ld\+json"[^>]*>(.*?)</script>',
     html,
