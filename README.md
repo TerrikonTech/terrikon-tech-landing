@@ -9,8 +9,8 @@
 
 ## Секции
 
-1. **Hero** — две темы и запечённая 40-кадровая фигура поверх заголовка,
-   которая без задержки реагирует на положение мыши.
+1. **Hero** — две темы, poster-first видео со скраббингом мышью и
+   WebGL-вырезкой фигуры поверх заголовка.
 2. **Визуальная марка** — две типографические motion-ленты направлений.
 3. **О нас** — позиционирование студии и прямой CTA.
 4. **Услуги** — пять направлений разработки.
@@ -33,28 +33,14 @@ npm run preview
 Dev-сервер Vite использует http://localhost:5175. Production-сборка попадает
 в `dist/`.
 
-## Hero-ассеты
-
-Интерактивная фигура больше не декодирует и не перематывает MP4 в браузере.
-`scripts/bake_subject_atlas.py` собирает исходные ролики и маски из
-`assets/hero-source/` в четыре production-ассета:
-
-- `public/subject-{light,dark}-frames.webp` — 40 прозрачных кадров, сетка 8×5;
-- `public/subject-{light,dark}-poster.webp` — лёгкий статичный fallback.
-
-Пересборка требует Python Playwright и установленный Chromium:
-
-```bash
-python scripts/bake_subject_atlas.py
-```
-
 ## Производительность и доступность
 
 - Шрифты, проектные превью и hero-медиа хранятся локально.
-- На desktop один `pointermove` выбирает готовый кадр WebP-атласа и планирует
-  не больше одной Canvas 2D-отрисовки на `requestAnimationFrame`.
-- На touch, при `prefers-reduced-motion: reduce` и `Save-Data` загружается
-  только прозрачный постер: без атласа, видео, WebGL и автоплея.
+- Hero на touch-устройствах загружает видео только после взаимодействия.
+- При `prefers-reduced-motion: reduce` скраббинг, WebGL-маска, параллакс и
+  длительные CSS-переходы отключаются; при `Save-Data` hero остаётся на постере
+  и не запрашивает MP4 или WebGL-атлас.
+- Hero-видео — all-intra MP4; обычная перекодировка сломает быстрый seek.
 - Production-пререндер выполняет `scripts/prerender.py`, а
   `scripts/validate_build.py` проверяет SEO DOM и медиарегрессии.
 
