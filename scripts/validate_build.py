@@ -36,6 +36,31 @@ production_text = "\n".join(
 )
 assert "motionsites.ai" not in production_text, "external project media is present"
 
+
+hero_assets = {
+    "scene-light-frames.webp": 400_000,
+    "scene-dark-frames.webp": 900_000,
+    "subject-light-frames.webp": 700_000,
+    "subject-dark-frames.webp": 1_300_000,
+    "scene-light-poster.webp": 10_000,
+    "scene-dark-poster.webp": 30_000,
+    "subject-light-poster.webp": 15_000,
+    "subject-dark-poster.webp": 35_000,
+}
+for asset_name, minimum_size in hero_assets.items():
+    asset_path = STATIC_DIR / asset_name
+    assert asset_path.is_file(), f"hero asset is missing: {asset_path}"
+    assert asset_path.stat().st_size >= minimum_size, (
+        f"hero asset is unexpectedly small: {asset_path}"
+    )
+    assert asset_name in production_text, f"hero asset is not wired: {asset_name}"
+assert not list(STATIC_DIR.glob("portrait-scrub*.mp4")), "runtime hero MP4 was copied"
+assert not list(STATIC_DIR.glob("subject-mask-*-atlas.png")), (
+    "runtime WebGL mask was copied"
+)
+assert "portrait-scrub" not in production_text, "runtime video seek returned"
+assert "subject-mask-" not in production_text, "runtime WebGL mask returned"
+
 project_names = [
     "Space Voyage",
     "CodeNest",
