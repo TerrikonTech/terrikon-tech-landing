@@ -41,12 +41,6 @@ with sync_playwright() as p:
     page.mouse.move(10, 10)
     page.mouse.move(12, 10)
     page.wait_for_timeout(300)
-    # Десктопный пререндер включает metadata для скраббинга. Перед снапшотом
-    # возвращаем preload=none, иначе мобильный браузер начнёт MP4 ещё до React.
-    page.eval_on_selector_all(
-        "video",
-        "videos => videos.forEach(video => { video.pause(); video.preload = 'none' })",
-    )
     html = page.evaluate("document.documentElement.outerHTML")
     browser.close()
 httpd.shutdown()
